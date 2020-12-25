@@ -1,0 +1,17 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+    <script src="/static/app/vendors/socketio/socket.io.js"></script>
+    <script src="/static/gameplay/lobby.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h4>Lobby</h4>
+                {% block body_inside %} {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

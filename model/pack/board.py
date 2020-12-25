@@ -1,0 +1,16 @@
+from app import db
+
+
+class Board(db.Model):
+    __tablename__ = 'boards'
+
+    id = db.Column(db.Integer, primary_key=True)
+    topics = db.relationship("Topic", backref="board", lazy=True)
+
+    pack_id = db.Column(db.Integer, db.ForeignKey('packs.id'), nullable=False)
+
+    def __str__(self):
+        return f"Board: {self.id}"
+
+    def __repr__(self):
+        return self.__str__()

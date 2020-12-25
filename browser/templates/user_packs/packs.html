@@ -1,0 +1,26 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+    <script src="/static/browser/user_packs.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h4>Твои паки</h4>
+                <div id="packsList" class="list-group" style="max-height: 60vh; overflow:scroll;" role="tablist">
+                    {% for pack in packs %}
+                        <div data-toggle="list" class="list-group-item list-group-item-action" role="tab"
+                             onclick="viewPack('{{ pack['id'] }}');">{{ pack['name'] }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-6">
+                <h4 id="packName"></h4>
+                <div id="topicsList" class="list-group" style="max-height: 60vh; overflow:scroll;" role="tablist">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

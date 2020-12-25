@@ -1,0 +1,23 @@
+from app import db
+
+
+class Question(db.Model):
+    __tablename__ = 'questions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text)
+    answer = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+
+    image_url = db.Column(db.String(128))
+    video_url = db.Column(db.String(128))
+    music_url = db.Column(db.String(128))
+
+    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
+    board_progress_id = db.Column(db.Integer, db.ForeignKey('board_progress.id'))
+
+    def __str__(self):
+        return f"Question: {self.id}"
+
+    def __repr__(self):
+        return self.__str__()
