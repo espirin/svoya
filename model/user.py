@@ -15,8 +15,7 @@ class User(db.Model):
 
     packs = db.relationship('Pack', lazy=True, foreign_keys="[Pack.owner_username]")
 
-    game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
-    lobby_id = db.Column(db.String(16), db.ForeignKey('lobbies.id'))
+    game_id = db.Column(db.String(8), db.ForeignKey('games.id'))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

@@ -4,12 +4,16 @@ from app import db
 class Game(db.Model):
     __tablename__ = 'games'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(6), primary_key=True)
     created = db.Column(db.DateTime, nullable=False)
+
     host_id = db.Column(db.String(64), db.ForeignKey('users.username'))
+
     pack_id = db.Column(db.Integer, db.ForeignKey('packs.id'))
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     current_board_progress_id = db.Column(db.Integer, db.ForeignKey('board_progress.id'))
+
+    scores = db.Column(db.JSON, default=dict())
 
     players = db.relationship('User', lazy=True, foreign_keys="[User.game_id]")
     host = db.relationship('User', uselist=False, lazy=True, foreign_keys=[host_id])
