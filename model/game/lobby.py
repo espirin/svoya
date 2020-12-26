@@ -4,7 +4,7 @@ from app import db
 class Lobby(db.Model):
     __tablename__ = 'lobbies'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(16), primary_key=True)
     host_id = db.Column(db.String(64), db.ForeignKey('users.username'))
     pack_id = db.Column(db.Integer, db.ForeignKey('packs.id'))
 

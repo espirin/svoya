@@ -6,6 +6,7 @@ function viewPack(pack_id) {
         contentType: "application/json",
         success: function (data) {
             $('#packName').text(data['name']);
+            $('#createLobbyButton').attr("href", "/lobby/host/" + data['id']);
 
             const topics = $('#topicsList');
             topics.empty();
@@ -14,7 +15,6 @@ function viewPack(pack_id) {
                     .text(data['topics'][i])
                     .addClass("list-group-item list-group-item-action")
                     .attr("role", "tab")
-                    .attr("data-toggle", "list")
                     .appendTo(topics);
             });
         }

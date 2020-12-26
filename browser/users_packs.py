@@ -21,5 +21,6 @@ def view_pack():
     topics = [topic.name for board in pack.boards for topic in board.topics]
     return jsonify({
         "name": pack.name,
+        "id": pack.id,
         "topics": topics
     })

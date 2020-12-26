@@ -59,7 +59,7 @@ def login_post():
     if check_password_hash(user.password_hash, password):
         login_user(user, remember=True)
         next = request.args.get('next')
-        if next != 'auth.login':
+        if next != 'auth.login' and next is not None:
             return redirect(next)
         return redirect(url_for('index.index_page'))
     return "Wrong password"
