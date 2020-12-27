@@ -6,7 +6,9 @@ function viewPack(pack_id) {
         contentType: "application/json",
         success: function (data) {
             $('#packName').text(data['name']);
-            $('#createLobbyButton').attr("href", "/lobby/host/" + data['id']);
+            $('#createGameButton').on("click", function () {
+                createGame(data['id']);
+            });
 
             const topics = $('#topicsList');
             topics.empty();
@@ -17,6 +19,18 @@ function viewPack(pack_id) {
                     .attr("role", "tab")
                     .appendTo(topics);
             });
+        }
+    })
+}
+
+function createGame(pack_id) {
+    $.ajax({
+        url: "/create_game",
+        data: JSON.stringify(pack_id),
+        type: "POST",
+        contentType: "application/json",
+        success: function (gameURL) {
+            window.location.href = gameURL;
         }
     })
 }

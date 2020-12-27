@@ -1,12 +1,12 @@
 from app import db, login_manager, app, socketio
 from app.index import index
 from auth.auth import auth
-from gameplay.lobby import lobby_blueprint
+from gameplay.gameplay import gameplay
 from browser.users_packs import user_packs
 
 app.register_blueprint(auth)
 app.register_blueprint(index)
-app.register_blueprint(lobby_blueprint, url_prefix='/lobby')
+app.register_blueprint(gameplay)
 app.register_blueprint(user_packs, url_prefix='/user_packs')
 
 login_manager.init_app(app)
