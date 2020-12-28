@@ -1,11 +1,5 @@
 {% extends "app/base.html" %}
 
-{% block head %}
-    <script src="/static/app/vendors/socketio/socket.io.js"></script>
-    <script src="/static/gameplay/host.js"></script>
-    <script src="/static/gameplay/shared.js"></script>
-{% endblock %}
-
 {% block body %}
     <div class="container">
         <div class="row">
@@ -14,8 +8,13 @@
                 <a style="display: none" id="gameID">{{ game_id }}</a>
                 <a style="display: none" id="username">{{ username }}</a>
                 <a id="gameURL">{{ game_url }}</a>
-                <button class="btn btn-primary ml-3" onclick="copyToClipboard('#gameURL')">Скопировать ссылку</button>
-                <a class="btn btn-primary ml-3" href="/{{ game_id }}">Стать игроком</a>
+                <button class="btn btn-primary ml-3" id="copyURLButton" data-clipboard-target="#gameURL">Скопировать
+                    ссылку
+                </button>
+                <br>
+                <button class="btn btn-primary mt-2" onclick="copyToClipboard('#gameURL')">Начать игру</button>
+                <br>
+                <a class="btn btn-primary mt-2" href="/{{ game_id }}">Стать игроком</a>
                 <br>
                 <br>
                 <pre id="message"></pre>
@@ -24,4 +23,9 @@
             </div>
         </div>
     </div>
+
+    <script src="/static/app/vendors/socketio/socket.io.js"></script>
+    <script src="/static/gameplay/host.js"></script>
+    <script src="/static/app/vendors/clipboard/clipboard.min.js"></script>
+    <script src="/static/gameplay/shared.js"></script>
 {% endblock %}
