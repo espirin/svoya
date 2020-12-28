@@ -1,9 +1,9 @@
-const socket = io('/host');
+const socket = io('/player');
 const generalSocket = io('/');
 
 socket.on("connect", function () {
     console.log("connected to game");
-    socket.emit("connect_host", $("#gameID").text());
+    socket.emit("connect_player", $("#gameID").text());
 });
 
 setInterval(function () {

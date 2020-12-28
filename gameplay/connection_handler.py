@@ -1,0 +1,59 @@
+from flask_login import login_required, current_user
+
+from app import socketio, db
+from model import Game, User
+
+
+@socketio.on('connect_player', namespace='/player')
+@login_required
+def connect_player(game_id):
+    game = Game.query.filter(Game.id == game_id).first()
+
+    if game is None:
+        return "Игра не существует"
+
+    game.players.append(current_user)
+    db.session.commit()
+    print(f"Player {current_user.username} connected to game {game_id}")
+
+
+@socketio.on('disconnect', namespace='/player')
+@login_required
+def disconnect_player():
+    game = Game.query.filter(Game.players.any(User.username == current_user.username)).first()
+    if game is not None:  # Check if the game was exited from another browser tab
+        game.players.remove(current_user)
+        db.session.commit()
+        print(f"Player {current_user.username} disconnected from game {game.id}")
+
+
+@socketio.on('connect_host', namespace='/host')
+@login_required
+def connect_host(game_id):
+    game = Game.query.filter(Game.id == game_id).first()
+
+    if game is None:
+        return "Игра не существует"
+
+    if game.host is not None:
+        return "Место ведущего уже занято"
+
+    game.host = current_user
+    db.session.commit()
+    print(f"Host {current_user.username} connected to game {game_id}")
+
+
+@socketio.on('disconnect', namespace='/host')
+@login_required
+def disconnect_host():
+    game = Game.query.filter(Game.host == current_user).first()
+    if game is not None:  # Check if the game was exited from another browser tab
+        game.host = None
+        db.session.commit()
+        print(f"Host {current_user.username} disconnected from game {game.id}")
+
+
+@socketio.on('ping', namespace='/')
+@login_required
+def ping():
+    return "pong"

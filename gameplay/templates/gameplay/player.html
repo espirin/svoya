@@ -2,7 +2,7 @@
 
 {% block head %}
     <script src="/static/app/vendors/socketio/socket.io.js"></script>
-    <script src="/static/gameplay/gameplay.js"></script>
+    <script src="/static/gameplay/player.js"></script>
     <script src="/static/gameplay/shared.js"></script>
 {% endblock %}
 
@@ -14,6 +14,7 @@
                 <a style="display: none" id="gameID">{{ game_id }}</a>
                 <a id="gameURL">{{ game_url }}</a>
                 <button class="btn btn-primary ml-3" onclick="copyToClipboard('#gameURL')">Скопировать ссылку</button>
+                <a class="btn btn-primary ml-3" href="/host/{{ game_id }}">Стать ведущим</a>
                 <br>
                 <a id="message"></a>
             </div>
