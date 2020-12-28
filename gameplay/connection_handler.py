@@ -12,8 +12,14 @@ def connect_player(game_id):
     if game is None:
         return "Игра не существует"
 
+    # Add player to the players list
     game.players.append(current_user)
     db.session.commit()
+
+    # Create score entry for the player
+    if current_user.username not in game.scores:
+        game.scores[current_user.username] = 0
+        db.session.commit()
     print(f"Player {current_user.username} connected to game {game_id}")
 
 

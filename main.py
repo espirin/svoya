@@ -3,7 +3,7 @@ from app.index import index
 from auth.auth import auth
 from gameplay.game_page import game_page
 from browser.users_packs import user_packs
-import gameplay.connection_handler
+import gameplay
 
 app.register_blueprint(auth)
 app.register_blueprint(index)
