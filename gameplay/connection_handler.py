@@ -1,4 +1,5 @@
 from flask_login import login_required, current_user
+from flask_socketio import join_room, leave_room
 
 from app import socketio, db
 from model import Game, User
@@ -20,6 +21,9 @@ def connect_player(game_id):
     if current_user.username not in game.scores:
         game.scores[current_user.username] = 0
         db.session.commit()
+
+    # Add player to the current room
+    join_room(game_id)
     print(f"Player {current_user.username} connected to game {game_id}")
 
 
@@ -30,6 +34,7 @@ def disconnect_player():
     if game is not None:  # Check if the game was exited from another browser tab
         game.players.remove(current_user)
         db.session.commit()
+        leave_room(game.id)
         print(f"Player {current_user.username} disconnected from game {game.id}")
 
 
@@ -46,6 +51,8 @@ def connect_host(game_id):
 
     game.host = current_user
     db.session.commit()
+
+    join_room(game_id)
     print(f"Host {current_user.username} connected to game {game_id}")
 
 
@@ -56,6 +63,7 @@ def disconnect_host():
     if game is not None:  # Check if the game was exited from another browser tab
         game.host = None
         db.session.commit()
+        leave_room(game.id)
         print(f"Host {current_user.username} disconnected from game {game.id}")
 
 

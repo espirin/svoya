@@ -31,6 +31,7 @@ def get_game_state(game_id):
                 "username": game.host.username if game.host is not None else None}
 
         return {
+            "state": GameState(game.state).name,
             "players": players,
             "host": host,
         }
@@ -57,6 +58,7 @@ def get_game_state(game_id):
                 })
 
         return {
+            "state": GameState(game.state).name,
             "players": players,
             "host": host,
             "board": json_board

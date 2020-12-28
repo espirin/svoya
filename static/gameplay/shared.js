@@ -17,3 +17,9 @@ generalSocket.on("connect", function () {
         $('#message').text(JSON.stringify(state, null, 2));
     });
 });
+
+socket.on("state_update", function (state) {
+    console.log("state update message");
+    console.log(JSON.stringify(state, null, 2));
+    $('#message').text(JSON.stringify(state, null, 2));
+});
