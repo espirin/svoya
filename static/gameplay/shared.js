@@ -1,6 +1,9 @@
 const generalSocket = io('/');
 new ClipboardJS('#copyURLButton');
 
+let questionID = null;
+let gameID = $("#gameID").text();
+
 setInterval(function () {
     let startTime = Date.now();
     generalSocket.emit('ping', function () {
@@ -9,21 +12,14 @@ setInterval(function () {
     });
 }, 2000);
 
-generalSocket.on("connect", function () {
-    console.log("Getting game state");
-    generalSocket.emit("get_game_state", $("#gameID").text(), function (state) {
-        console.log("Received game state");
-        console.log(JSON.stringify(state, null, 2));
-        $('#message').text(JSON.stringify(state, null, 2));
-    });
-});
-
 socket.on("state_update", function (state) {
     console.log("state update message");
-    console.log(JSON.stringify(state, null, 2));
     $('#message').text(JSON.stringify(state, null, 2));
+    if ("question" in state) {
+        questionID = state["question"]["id"]
+    }
 });
 
 function openQuestion(questionID) {
-    generalSocket.emit("open_question", [questionID, $("#gameID").text()]);
+    generalSocket.emit("open_question", [questionID, gameID]);
 }

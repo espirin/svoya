@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from flask_login import login_required, current_user
 
 from app import socketio, db
+from config import config
 from gameplay.state_handler import GameState, update_clients
 from model import Game, BoardProgress, Question
 
@@ -44,6 +47,8 @@ def start_countdown(game_id):
 
     # Save temporary state
     game.temporary_state['countdown_winner'] = None
+    game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
+    game.temporary_state['countdown_time_remaining'] = config.COUNTDOWN_DURATION
     db.session.commit()
 
 
@@ -62,14 +67,19 @@ def end_countdown(game_id):
 def answer_question(game_id):
     # Check if first to answer
     game = Game.query.filter(Game.id == game_id).first()
-    if not(game.state == GameState.COUNTDOWN.value and game.temporary_state['countdown_winner'] is None):
+    if game.state != GameState.COUNTDOWN.value:
         return
-
-    # Save winner
-    game.temporary_state['countdown_winner'] = current_user.username
 
     # Change game state to ANSWERING
     game.state = GameState.ANSWERING.value
+    db.session.commit()
+
+    # Save winner
+    game.temporary_state['countdown_winner'] = current_user.username
+    game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
+    game.temporary_state['countdown_time_remaining'] -= \
+        (datetime.now() - datetime.fromisoformat(game.temporary_state['countdown_start_time'])).microseconds
+
     db.session.commit()
 
     # Update clients
@@ -79,9 +89,13 @@ def answer_question(game_id):
 
 @socketio.on('correct_answer', namespace='/host')
 @login_required
-def correct_answer(question_id, game_id):
+def correct_answer(data):
+    print(data)
+    question_id = data['question_id']
+    game_id = data['game_id']
+
     game = Game.query.filter(Game.id == game_id).first()
-    question = Question.filter(Question.id == question_id).first()
+    question = Question.query.filter(Question.id == question_id).first()
 
     # Add points
     game.scores[game.temporary_state['countdown_winner']] += question.price
@@ -91,6 +105,37 @@ def correct_answer(question_id, game_id):
 
     # Change game state to CORRECT_ANSWER
     game.state = GameState.CORRECT_ANSWER.value
+    db.session.commit()
+
+    # Update clients
+    update_clients(game_id)
+
+
+@socketio.on('wrong_answer', namespace='/host')
+@login_required
+def wrong_answer(data):
+    question_id = data['question_id']
+    game_id = data['game_id']
+
+    game = Game.query.filter(Game.id == game_id).first()
+    question = Question.query.filter(Question.id == question_id).first()
+
+    # Subtract points
+    game.scores[game.temporary_state['countdown_winner']] -= question.price
+
+    if game.temporary_state['countdown_time_remaining'] <= 0:
+        # Mark question as answered
+        game.current_board_progress.answered_questions.append(question)
+
+        # Change game state to CORRECT_ANSWER
+        game.state = GameState.CORRECT_ANSWER.value
+    else:
+        # Change game state to COUNTDOWN
+        game.state = GameState.COUNTDOWN.value
+
+        # Update start time
+        game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
+
     db.session.commit()
 
     # Update clients

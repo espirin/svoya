@@ -15,14 +15,13 @@
                 <br>
                 <br>
                 <pre id="message"></pre>
-                <a id="playersList"></a>
-                <a id="host"></a>
+                <button class="btn btn-danger" onclick="answerQuestion()">Ответ</button>
             </div>
         </div>
     </div>
 
     <script src="/static/app/vendors/socketio/socket.io.js"></script>
-    <script src="/static/gameplay/player.js"></script>
     <script src="/static/app/vendors/clipboard/clipboard.min.js"></script>
     <script src="/static/gameplay/shared.js"></script>
+    <script src="/static/gameplay/player.js"></script>
 {% endblock %}

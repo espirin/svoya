@@ -24,7 +24,7 @@ def get_game_state(game_id):
         return "Игра не найдена"
 
     players = create_players_info(game)
-    host = create_host_info
+    host = create_host_info(game)
 
     if game.state == GameState.LOBBY.value:
         # Lobby
@@ -89,6 +89,7 @@ def create_host_info(game) -> Dict:
 
 def create_question_info(question) -> Dict:
     return {
+        "id": question.id,
         "text": question.text,
         "answer": question.answer,
         "price": question.price,
