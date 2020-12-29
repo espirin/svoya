@@ -4,7 +4,7 @@ from typing import List, Dict
 from flask_login import login_required
 
 from app import socketio
-from model import Game
+from model import Game, Question
 
 
 class GameState(Enum):
@@ -20,32 +20,22 @@ class GameState(Enum):
 @login_required
 def get_game_state(game_id):
     game = Game.query.filter(Game.id == game_id).first()
+    if game is None:
+        return "Игра не найдена"
+
+    players = create_players_info(game)
+    host = create_host_info
 
     if game.state == GameState.LOBBY.value:
-        players = [{"name": player.name, "username": player.username} for player in game.players]
-        for player in players:
-            player['score'] = 0
-            player['next_turn'] = False
-
-        host = {"name": game.host.name if game.host is not None else None,
-                "username": game.host.username if game.host is not None else None}
-
+        # Lobby
         return {
             "state": GameState(game.state).name,
             "players": players,
             "host": host,
         }
 
-    if game.state == GameState.BOARD.value:
-        players = [{"name": player.name, "username": player.username} for player in game.players]
-        scores = game.scores
-        for player in players:
-            player['score'] = scores[player['username']]
-            player['next_turn'] = game.next_turn == player
-
-        host = {"name": game.host.name if game.host is not None else None,
-                "username": game.host.username if game.host is not None else None}
-
+    elif game.state == GameState.BOARD.value:
+        # Questions board
         board = game.current_board
         answered_questions = game.current_board_progress.answered_questions
         json_board: List[List[Dict]] = []
@@ -54,7 +44,8 @@ def get_game_state(game_id):
             for question in topic.questions:
                 json_board[-1].append({
                     "price": question.price,
-                    "answered": question in answered_questions
+                    "answered": question in answered_questions,
+                    "id": question.id
                 })
 
         return {
@@ -63,3 +54,51 @@ def get_game_state(game_id):
             "host": host,
             "board": json_board
         }
+
+    elif game.state == GameState.QUESTION.value or game.state == GameState.ANSWERING.value or \
+            game.state == GameState.CORRECT_ANSWER.value:
+        # Question
+        question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
+
+        return {
+            "state": GameState(game.state).name,
+            "players": players,
+            "host": host,
+            "question": create_question_info(question)
+        }
+
+
+def create_players_info(game) -> List[Dict]:
+    players = [{"name": player.name, "username": player.username} for player in game.players]
+    scores = game.scores
+    for player in players:
+        player['score'] = scores[player['username']]
+        player['next_turn'] = game.next_turn == player
+        player['answering'] = 'answering' in game.temporary_state \
+                              and game.temporary_state['answering'] == player['username']
+
+    return players
+
+
+def create_host_info(game) -> Dict:
+    return {
+        "name": game.host.name if game.host is not None else None,
+        "username": game.host.username if game.host is not None else None
+    }
+
+
+def create_question_info(question) -> Dict:
+    return {
+        "text": question.text,
+        "answer": question.answer,
+        "price": question.price,
+        "image_url": question.image_url,
+        "video_url": question.video_url,
+        "music_url": question.music_url
+    }
+
+
+def update_clients(game_id):
+    state = get_game_state(game_id)
+    socketio.emit('state_update', state, room=game_id, namespace="/host")
+    socketio.emit('state_update', state, room=game_id, namespace="/player")

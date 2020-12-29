@@ -23,3 +23,7 @@ socket.on("state_update", function (state) {
     console.log(JSON.stringify(state, null, 2));
     $('#message').text(JSON.stringify(state, null, 2));
 });
+
+function openQuestion(questionID) {
+    generalSocket.emit("open_question", [questionID, $("#gameID").text()]);
+}

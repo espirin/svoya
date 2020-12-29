@@ -18,6 +18,7 @@ class Game(db.Model):
     current_board_progress_id = db.Column(db.Integer, db.ForeignKey('board_progress.id'))
 
     scores = db.Column(MutableDict.as_mutable(db.JSON), default=MutableDict())
+    temporary_state = db.Column(MutableDict.as_mutable(db.JSON), default=MutableDict())
 
     players = db.relationship('User', lazy=True, foreign_keys="[User.game_id]")
     host = db.relationship('User', uselist=False, lazy=True, foreign_keys=[host_id])

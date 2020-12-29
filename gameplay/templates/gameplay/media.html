@@ -1,0 +1,14 @@
+{% extends "app/base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+    <a id="videoID" style="display: none">{{ video_id }}</a>
+    <div style="position:relative; display: inline-block;">
+        <div class="hidelogo" style="position: absolute; left: 60px; top: 20px; width: 410px; height: 25px; z-index:999; background: #222; display: block;"></div>
+        <div id="player"></div>
+    </div>
+    <script src="/static/gameplay/media.js"></script>
+{% endblock %}
