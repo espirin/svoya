@@ -3,3 +3,8 @@
     height: 8vw;
     object-fit: cover;
 }
+
+.progress.active .progress-bar {
+    -webkit-transition: none !important;
+    transition: none !important;
+}

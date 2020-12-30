@@ -5,43 +5,7 @@ socket.on("connect", function () {
     socket.emit("connect_player", gameID);
 
     generalSocket.emit("get_game_state", gameID, function (state) {
-        let message = $('#message');
-        let board = $('#board');
-
-        message.text(JSON.stringify(state, null, 2));
-        if (state['state'] === 'LOBBY') {
-            message.text("Лобби");
-        }
-        if (state['state'] === 'BOARD') {
-            message.text("Вопросы");
-            board.empty();
-            for (const topic of state['board']) {
-                let row = $("<btn-group></btn-group>")
-                    .addClass("btn-group btn-group-lg mt-2")
-                    .attr("role", "group")
-                    .append($("<button></button>")
-                        .addClass("btn btn-info text-truncate")
-                        .attr("style", "width: 200px")
-                        .html(topic['name']));
-                for (const question of topic['questions']) {
-                    if (question['answered']) {
-                        row.append($("<button></button>")
-                            .attr("type", "button")
-                            .addClass("btn btn-secondary")
-                            .html(question['price'])
-                            .attr("onclick", "openQuestion(" + question['id'] + ");"));
-                    } else {
-                        row.append($("<button></button>")
-                            .attr("type", "button")
-                            .addClass("btn btn-primary")
-                            .html(question['price'])
-                            .attr("onclick", "openQuestion(" + question['id'] + ");"));
-                    }
-                }
-                board.append(row);
-                board.append($("<br>"));
-            }
-        }
+        update_state(state)
     });
 });
 
@@ -67,13 +31,32 @@ socket.on("test", function () {
 });
 
 socket.on("state_update", function (state) {
-    console.log("state update message");
-    $('#message').text(JSON.stringify(state, null, 2));
-    if ("question" in state) {
-        questionID = state["question"]["id"]
-    }
+    update_state(state)
 });
 
 socket.on("update_clients", function (clients) {
     update_clients(clients);
 });
+
+function update_state(state) {
+    if ("question" in state) {
+        questionID = state["question"]["id"]
+    }
+    if (state['state'] === 'LOBBY') {
+        $('#message').text("Лобби");
+    }
+    if (state['state'] === 'BOARD') {
+        showBoard(state);
+    }
+    if (state['state'] === 'QUESTION') {
+        showQuestion(state);
+    }
+    if (state['state'] === 'COUNTDOWN') {
+        showQuestion(state);
+        showCountdown(state['time']);
+    }
+    if (state['state'] === 'ANSWERING') {
+        clearTimeout();
+        showQuestion(state);
+    }
+}

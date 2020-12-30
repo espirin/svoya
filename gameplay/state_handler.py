@@ -57,6 +57,15 @@ def get_game_state(game_id):
             "state": GameState(game.state).name,
             "question": create_question_info(question)
         }
+    elif game.state == GameState.COUNTDOWN.value:
+        # Question
+        question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
+
+        return {
+            "time": game.temporary_state['countdown_time_remaining'],
+            "state": GameState(game.state).name,
+            "question": create_question_info(question)
+        }
 
 
 def create_players_info(game) -> List[Dict]:

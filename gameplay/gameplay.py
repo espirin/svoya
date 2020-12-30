@@ -11,6 +11,7 @@ from model import Game, BoardProgress, Question
 @socketio.on('start_game', namespace='/host')
 @login_required
 def start_game(game_id):
+    print('hey')
     # Change game state to BOARD
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.BOARD.value
@@ -53,6 +54,7 @@ def start_countdown(game_id):
     game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
     game.temporary_state['countdown_time_remaining'] = config.COUNTDOWN_DURATION
     db.session.commit()
+    update_clients_state(game_id)
 
 
 @socketio.on('end_countdown', namespace='/player')
@@ -86,8 +88,7 @@ def answer_question(game_id):
     db.session.commit()
 
     # Update clients
-    socketio.emit('answering', current_user.username, room=game_id, namespace="/player")
-    socketio.emit('answering', current_user.username, room=game_id, namespace="/host")
+    update_clients_state(game_id)
 
 
 @socketio.on('correct_answer', namespace='/host')
@@ -149,7 +150,7 @@ def wrong_answer(data):
 @login_required
 def open_board(game_id):
     game = Game.query.filter(Game.id == game_id).first()
-    game.state = GameState.BOARD
+    game.state = GameState.BOARD.value
     db.session.commit()
 
     # Update clients

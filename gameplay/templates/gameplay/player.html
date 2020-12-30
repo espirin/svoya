@@ -16,6 +16,15 @@
             </div>
         </div>
         <div class="col mb-3" id="board"></div>
+        <div class="row mb-3">
+            <div class="col-4"></div>
+            <h3 class="col-4 text-center" id="questionText"></h3>
+        </div>
+        <div class="col-xs-12 col-sm-12 progress-container">
+            <div class="progress progress-striped active">
+                <div class="progress-bar progress-bar-success" id="countdown" style="width:0"></div>
+            </div>
+        </div>
         <div class="row mt-auto">
             <div class="col-10">
                 <div class="row row-cols-1 row-cols-md-6 g-3 justify-content-md-center" id="playersCards"></div>
@@ -29,9 +38,11 @@
             <div class="col-md-4">
                 <div class="row">
                     <button class="btn btn-block btn-primary" style="height: 100px" onclick="answerQuestion()"
-                            id="answerButton">Ответить</button>
+                            id="answerButton">Ответить
+                    </button>
                     <button class="btn btn-block btn-danger" style="display:none; height: 100px"
-                            id="answerFalseButton">...</button>
+                            id="answerFalseButton">...
+                    </button>
                 </div>
             </div>
         </div>

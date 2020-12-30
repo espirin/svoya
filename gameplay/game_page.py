@@ -51,4 +51,6 @@ def host_page(game_id):
         return "Невозможно участвовать в нескольких играх одновременно"
 
     game_url = f"{request.url_root}{game_id}"
-    return render_template('gameplay/host.html', game_id=game_id, game_url=game_url, username=current_user.username)
+    game = Game.query.filter(Game.id == game_id).first()
+    return render_template('gameplay/host.html', game_id=game_id, game_url=game_url, username=current_user.username,
+                           pack_name=game.pack.name)

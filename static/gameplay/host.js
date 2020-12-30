@@ -5,13 +5,16 @@ socket.on("connect", function () {
     socket.emit("connect_host", gameID);
 
     generalSocket.emit("get_game_state", gameID, function (state) {
-        console.log(JSON.stringify(state, null, 2));
-        $('#message').text(JSON.stringify(state, null, 2));
+        update_state(state)
     });
 });
 
 function startGame() {
     socket.emit("start_game", gameID);
+}
+
+function startCountdown() {
+    socket.emit("start_countdown", gameID);
 }
 
 function correctAnswer() {
@@ -31,13 +34,24 @@ socket.on("test", function () {
 });
 
 socket.on("state_update", function (state) {
-    console.log("state update message");
-    $('#message').text(JSON.stringify(state, null, 2));
-    if ("question" in state) {
-        questionID = state["question"]["id"]
-    }
+    update_state(state);
 });
 
 socket.on("update_clients", function (clients) {
     update_clients(clients);
 });
+
+function update_state(state) {
+    if ("question" in state) {
+        questionID = state["question"]["id"]
+    }
+    if (state['state'] === 'LOBBY') {
+        $('#message').text("Лобби");
+    }
+    if (state['state'] === 'BOARD') {
+        showBoard(state);
+    }
+    if (state['state'] === 'QUESTION') {
+        showQuestion(state);
+    }
+}

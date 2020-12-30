@@ -30,7 +30,8 @@ function update_clients(clients) {
                         .addClass("card-img-top")
                         .attr("src", "/static/app/images/bobr.jpg"))
                     .append($("<div></div>")
-                        .addClass("card-body")
+                        .addClass((clients['players'][i]['answering'])
+                            ? "card-body" : "card-body text-white bg-primary")
                         .append($("<div></div>")
                             .addClass("col")
                             .append($("<h5></h5>").addClass("card-title text-center text-truncate")
@@ -72,4 +73,57 @@ function update_clients(clients) {
         .addClass("card-title text-center font-weight-bold mt-2")
         .text("хост"))
 
+}
+
+function showBoard(state) {
+    clearTimeout();
+    let board = $('#board');
+    let message = $('#message');
+    message.text("Вопросы");
+    board.empty();
+    for (const topic of state['board']) {
+        let row = $("<btn-group></btn-group>")
+            .addClass("btn-group btn-group-lg mt-2")
+            .attr("role", "group")
+            .append($("<button></button>")
+                .addClass("btn btn-info text-truncate")
+                .attr("style", "width: 200px")
+                .html(topic['name']));
+        for (const question of topic['questions']) {
+            if (question['answered']) {
+                row.append($("<button></button>")
+                    .attr("type", "button")
+                    .addClass("btn btn-secondary")
+                    .html(question['price'])
+                    .attr("onclick", "openQuestion(" + question['id'] + ");"));
+            } else {
+                row.append($("<button></button>")
+                    .attr("type", "button")
+                    .addClass("btn btn-primary")
+                    .html(question['price'])
+                    .attr("onclick", "openQuestion(" + question['id'] + ");"));
+            }
+        }
+        board.append(row);
+        board.append($("<br>"));
+    }
+}
+
+function showQuestion(state) {
+    $('#board').hide();
+    let questionText = $('#questionText');
+    questionText.show();
+    questionText.text(state['question']['text']);
+}
+
+function showCountdown(time) {
+    let countdown = $("#countdown");
+    countdown.animate({
+        width: "100%"
+    }, time * 1000);
+
+    setTimeout(function () {
+        countdown.hide();
+        socket.emit("end_countdown", gameID);
+    }, time * 1000)
 }
