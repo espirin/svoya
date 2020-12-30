@@ -3,7 +3,7 @@
 {% block body %}
     <div class="container">
         <div class="row">
-            <div class="col-6">
+            <div class="col">
                 <h4>Game</h4>
                 <a style="display: none" id="gameID">{{ game_id }}</a>
                 <a style="display: none" id="username">{{ username }}</a>
@@ -16,6 +16,15 @@
                 <br>
                 <pre id="message"></pre>
                 <button class="btn btn-danger" onclick="answerQuestion()">Ответ</button>
+
+                <div class="row">
+                    <div class="col-10">
+                        <div class="row row-cols-1 row-cols-md-6 g-3 justify-content-md-center" id="playersCards"></div>
+                    </div>
+                    <div class="col-2">
+                        <div class="row row-cols-1 row-cols-md-1 g-3 justify-content-md-center" id="hostCard"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

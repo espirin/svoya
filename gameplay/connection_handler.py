@@ -2,6 +2,7 @@ from flask_login import login_required, current_user
 from flask_socketio import join_room, leave_room
 
 from app import socketio, db
+from gameplay.state_handler import update_clients
 from model import Game, User
 
 
@@ -24,6 +25,7 @@ def connect_player(game_id):
 
     # Add player to the current room
     join_room(game_id)
+    update_clients(game_id)
     print(f"Player {current_user.username} connected to game {game_id}")
 
 
@@ -35,6 +37,7 @@ def disconnect_player():
         game.players.remove(current_user)
         db.session.commit()
         leave_room(game.id)
+        update_clients(game.id)
         print(f"Player {current_user.username} disconnected from game {game.id}")
 
 
@@ -53,6 +56,7 @@ def connect_host(game_id):
     db.session.commit()
 
     join_room(game_id)
+    update_clients(game_id)
     print(f"Host {current_user.username} connected to game {game_id}")
 
 
@@ -64,6 +68,7 @@ def disconnect_host():
         game.host = None
         db.session.commit()
         leave_room(game.id)
+        update_clients(game.id)
         print(f"Host {current_user.username} disconnected from game {game.id}")
 
 

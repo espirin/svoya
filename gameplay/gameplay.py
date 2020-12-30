@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 from app import socketio, db
 from config import config
-from gameplay.state_handler import GameState, update_clients
+from gameplay.state_handler import GameState, update_clients_state
 from model import Game, BoardProgress, Question
 
 
@@ -18,7 +18,7 @@ def start_game(game_id):
     game.current_board_progress = BoardProgress(board=game.current_board)
     db.session.commit()
 
-    update_clients(game_id)
+    update_clients_state(game_id)
 
 
 @socketio.on('open_question', namespace='/')
@@ -32,7 +32,7 @@ def open_question(question_id, game_id):
     game.temporary_state['question_id'] = question_id
     db.session.commit()
 
-    update_clients(game_id)
+    update_clients_state(game_id)
 
 
 @socketio.on('start_countdown', namespace='/host')
@@ -108,7 +108,7 @@ def correct_answer(data):
     db.session.commit()
 
     # Update clients
-    update_clients(game_id)
+    update_clients_state(game_id)
 
 
 @socketio.on('wrong_answer', namespace='/host')
@@ -139,7 +139,7 @@ def wrong_answer(data):
     db.session.commit()
 
     # Update clients
-    update_clients(game_id)
+    update_clients_state(game_id)
 
 
 @socketio.on('open_board', namespace='/host')
@@ -150,4 +150,4 @@ def open_board(game_id):
     db.session.commit()
 
     # Update clients
-    update_clients(game_id)
+    update_clients_state(game_id)

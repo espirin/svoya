@@ -25,3 +25,19 @@ function wrongAnswer() {
 function openBoard() {
     socket.emit("open_board", gameID);
 }
+
+socket.on("test", function () {
+    console.log("test");
+});
+
+socket.on("state_update", function (state) {
+    console.log("state update message");
+    $('#message').text(JSON.stringify(state, null, 2));
+    if ("question" in state) {
+        questionID = state["question"]["id"]
+    }
+});
+
+socket.on("update_clients", function (clients) {
+    update_clients(clients);
+});

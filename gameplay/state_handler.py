@@ -23,15 +23,10 @@ def get_game_state(game_id):
     if game is None:
         return "Игра не найдена"
 
-    players = create_players_info(game)
-    host = create_host_info(game)
-
     if game.state == GameState.LOBBY.value:
         # Lobby
         return {
             "state": GameState(game.state).name,
-            "players": players,
-            "host": host,
         }
 
     elif game.state == GameState.BOARD.value:
@@ -50,8 +45,6 @@ def get_game_state(game_id):
 
         return {
             "state": GameState(game.state).name,
-            "players": players,
-            "host": host,
             "board": json_board
         }
 
@@ -62,8 +55,6 @@ def get_game_state(game_id):
 
         return {
             "state": GameState(game.state).name,
-            "players": players,
-            "host": host,
             "question": create_question_info(question)
         }
 
@@ -99,7 +90,20 @@ def create_question_info(question) -> Dict:
     }
 
 
-def update_clients(game_id):
+def update_clients_state(game_id):
     state = get_game_state(game_id)
     socketio.emit('state_update', state, room=game_id, namespace="/host")
     socketio.emit('state_update', state, room=game_id, namespace="/player")
+    update_clients(game_id)
+
+
+def update_clients(game_id):
+    game = Game.query.filter(Game.id == game_id).first()
+    if game is None:
+        return "Игра не найдена"
+    players = create_players_info(game)
+    host = create_host_info(game)
+    message = {"players": players, "host": host}
+
+    socketio.emit('update_clients', message, room=game_id, namespace="/host")
+    socketio.emit('update_clients', message, room=game_id, namespace="/player")

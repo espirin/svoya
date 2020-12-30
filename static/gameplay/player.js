@@ -13,3 +13,19 @@ socket.on("connect", function () {
 function answerQuestion() {
     socket.emit("answer_question", gameID);
 }
+
+socket.on("test", function () {
+    console.log("test");
+});
+
+socket.on("state_update", function (state) {
+    console.log("state update message");
+    $('#message').text(JSON.stringify(state, null, 2));
+    if ("question" in state) {
+        questionID = state["question"]["id"]
+    }
+});
+
+socket.on("update_clients", function (clients) {
+    update_clients(clients);
+});
