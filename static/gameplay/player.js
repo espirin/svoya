@@ -56,7 +56,17 @@ function update_state(state) {
         showCountdown(state['time']);
     }
     if (state['state'] === 'ANSWERING') {
-        clearTimeout();
+        hideCountdown();
         showQuestion(state);
     }
+    if (state['state'] === 'CORRECT_ANSWER') {
+        showAnswer(state);
+    }
+}
+
+function showQuestion(state) {
+    $('#board').hide();
+    let questionText = $('#questionText');
+    questionText.show();
+    questionText.text(state['question']['text']);
 }

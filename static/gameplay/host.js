@@ -55,3 +55,10 @@ function update_state(state) {
         showQuestion(state);
     }
 }
+
+function showQuestion(state) {
+    $('#board').hide();
+    let questionText = $('#questionText');
+    questionText.show();
+    questionText.text(state['question']['text'] + "\n Ответ:" + state['question']['answer']);
+}

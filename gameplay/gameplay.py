@@ -59,12 +59,19 @@ def start_countdown(game_id):
 
 @socketio.on('end_countdown', namespace='/player')
 @login_required
-def end_countdown(game_id):
+def end_countdown(data):
+    question_id = data['question_id']
+    game_id = data['game_id']
+
     # Change game state to CORRECT_ANSWER
     game = Game.query.filter(Game.id == game_id).first()
+    question = Question.query.filter(Question.id == question_id).first()
     if game.state == GameState.COUNTDOWN.value:
         game.state = GameState.CORRECT_ANSWER.value
+        game.current_board_progress.answered_questions.append(question)
+        game.temporary_state['countdown_winner'] = None
         db.session.commit()
+        update_clients_state(game_id)
 
 
 @socketio.on('answer_question', namespace='/player')
@@ -94,7 +101,6 @@ def answer_question(game_id):
 @socketio.on('correct_answer', namespace='/host')
 @login_required
 def correct_answer(data):
-    print(data)
     question_id = data['question_id']
     game_id = data['game_id']
 
@@ -152,6 +158,7 @@ def open_board(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.BOARD.value
     db.session.commit()
+    game.temporary_state.clear()
 
     # Update clients
     update_clients_state(game_id)

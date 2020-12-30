@@ -17,6 +17,7 @@ function openQuestion(questionID) {
 }
 
 function update_clients(clients) {
+    console.log(clients);
     const players = $('#playersCards');
     players.empty();
     $.each(clients['players'], function (i) {
@@ -30,8 +31,8 @@ function update_clients(clients) {
                         .addClass("card-img-top")
                         .attr("src", "/static/app/images/bobr.jpg"))
                     .append($("<div></div>")
-                        .addClass((clients['players'][i]['answering'])
-                            ? "card-body" : "card-body text-white bg-primary")
+                        .addClass(clients['players'][i]['answering']
+                            ? "card-body text-white bg-primary" : "card-body")
                         .append($("<div></div>")
                             .addClass("col")
                             .append($("<h5></h5>").addClass("card-title text-center text-truncate")
@@ -77,10 +78,12 @@ function update_clients(clients) {
 
 function showBoard(state) {
     clearTimeout();
+    $('#questionText').hide();
     let board = $('#board');
     let message = $('#message');
     message.text("Вопросы");
     board.empty();
+    board.show();
     for (const topic of state['board']) {
         let row = $("<btn-group></btn-group>")
             .addClass("btn-group btn-group-lg mt-2")
@@ -109,21 +112,24 @@ function showBoard(state) {
     }
 }
 
-function showQuestion(state) {
-    $('#board').hide();
-    let questionText = $('#questionText');
-    questionText.show();
-    questionText.text(state['question']['text']);
+function showAnswer(state) {
+    $('#questionText').text(state['question']['answer']);
 }
 
 function showCountdown(time) {
     let countdown = $("#countdown");
-    countdown.animate({
+    countdown.show();
+    $("#countdownStripe").animate({
         width: "100%"
     }, time * 1000);
 
     setTimeout(function () {
-        countdown.hide();
-        socket.emit("end_countdown", gameID);
+        $("#countdown").hide();
+        socket.emit("end_countdown", {"game_id": gameID, "question_id": questionID});
     }, time * 1000)
+}
+
+function hideCountdown() {
+    clearTimeout();
+    $("#countdown").hide();
 }
