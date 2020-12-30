@@ -21,9 +21,12 @@ def start_game(game_id):
     update_clients_state(game_id)
 
 
-@socketio.on('open_question', namespace='/')
+@socketio.on('open_question', namespace='/player')
 @login_required
-def open_question(question_id, game_id):
+def open_question(data):
+    question_id = data['question_id']
+    game_id = data['game_id']
+
     # Change game state to QUESTION
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.QUESTION.value
@@ -68,7 +71,7 @@ def answer_question(game_id):
     # Check if first to answer
     game = Game.query.filter(Game.id == game_id).first()
     if game.state != GameState.COUNTDOWN.value:
-        return
+        return "nope"
 
     # Change game state to ANSWERING
     game.state = GameState.ANSWERING.value

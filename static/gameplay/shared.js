@@ -25,6 +25,7 @@ function update_clients(clients) {
                 .addClass("col")
                 .append($("<div></div>")
                     .addClass("card")
+                    .attr("style", "height: 210px")
                     .append($("<img>")
                         .addClass("card-img-top")
                         .attr("src", "/static/app/images/bobr.jpg"))
@@ -45,15 +46,30 @@ function update_clients(clients) {
             .addClass("col")
             .append($("<div></div>")
                 .addClass("card")
+                .attr("style", "height: 210px")
                 .append($("<img>")
                     .addClass("card-img-top")
                     .attr("src", "/static/app/images/bobr.jpg"))
                 .append($("<div></div>")
                     .addClass("card-body")
                     .append($("<div></div>")
-                        .addClass("col")
-                        .append($("<h5></h5>").addClass("card-title text-center text-truncate")
-                            .text(clients['host']["name"])).append($("<h5></h5>").addClass("card-title text-center font-weight-bold")
-                            .text("хост"))))))
+                        .addClass("col text-center")
+                        .attr("id", "hostCardBody")))))
+
+    let hostCardBody = $("#hostCardBody");
+    if (clients['host']['name'] == null) {
+        hostCardBody.append(
+            $("<a></a>")
+                .addClass("btn btn-info")
+                .text("Стать")
+                .attr("href", "/host/" + gameID))
+    } else {
+        hostCardBody.append($("<h5></h5>").addClass("card-title text-center text-truncate")
+            .text((clients['host']["name"] == null) ? "-" : clients['host']["name"]))
+    }
+
+    hostCardBody.append($("<h5></h5>")
+        .addClass("card-title text-center font-weight-bold mt-2")
+        .text("хост"))
 
 }

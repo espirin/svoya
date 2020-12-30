@@ -1,7 +1,7 @@
 {% extends "app/base.html" %}
 
 {% block body %}
-    <div class="container">
+    <div class="container d-flex flex-column" style="min-height: 85vh">
         <div class="row">
             <div class="col">
                 <h4>Game-host</h4>
@@ -24,14 +24,15 @@
                 <br>
                 <br>
                 <pre id="message"></pre>
-                <div class="row">
-                    <div class="col-10">
-                        <div class="row row-cols-1 row-cols-md-6 g-3 justify-content-md-center" id="playersCards"></div>
-                    </div>
-                    <div class="col-2">
-                        <div class="row row-cols-1 row-cols-md-1 g-3 justify-content-md-center" id="hostCard"></div>
-                    </div>
-                </div>
+            </div>
+        </div>
+        <div class="mt-auto">hey</div>
+        <div class="row">
+            <div class="col-10">
+                <div class="row row-cols-1 row-cols-md-6 g-3 justify-content-md-center" id="playersCards"></div>
+            </div>
+            <div class="col-2">
+                <div class="row row-cols-1 row-cols-md-1 g-3 justify-content-md-center" id="hostCard"></div>
             </div>
         </div>
     </div>

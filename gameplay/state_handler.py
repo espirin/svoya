@@ -33,11 +33,11 @@ def get_game_state(game_id):
         # Questions board
         board = game.current_board
         answered_questions = game.current_board_progress.answered_questions
-        json_board: List[List[Dict]] = []
+        json_board = []
         for topic in board.topics:
-            json_board.append([])
+            json_board.append({'name': topic.name, 'questions': []})
             for question in topic.questions:
-                json_board[-1].append({
+                json_board[-1]['questions'].append({
                     "price": question.price,
                     "answered": question in answered_questions,
                     "id": question.id
