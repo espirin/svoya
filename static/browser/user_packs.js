@@ -34,3 +34,14 @@ function createGame(pack_id) {
         }
     })
 }
+
+function createPack() {
+    $.ajax({
+        url: "/editor/create_pack",
+        type: "POST",
+        contentType: "application/json",
+        success: function (editorURL) {
+            window.location.href = editorURL;
+        }
+    })
+}

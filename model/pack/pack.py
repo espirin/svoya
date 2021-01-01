@@ -5,7 +5,7 @@ class Pack(db.Model):
     __tablename__ = 'packs'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128))
     public = db.Column(db.Boolean)
 
     boards = db.relationship("Board", backref="pack", lazy=True)

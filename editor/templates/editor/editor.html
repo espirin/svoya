@@ -1,0 +1,29 @@
+{% extends "app/base.html" %}
+
+{% block body %}
+    <div class="container d-flex flex-column" style="min-height: 85vh">
+        <div class="row">
+            <div class="col">
+                <h4>{{ pack_id }}</h4>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="text-center">Bootstrap Editable Table <span class="fa fa-edit pull-right bigicon"></span>
+                    </h4>
+                </div>
+                <div class="panel-body text-center">
+                    <div id="grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" type="text/css"
+          href="http://www.prepbootstrap.com/Content/shieldui-lite/dist/css/light/all.min.css"/>
+    <script type="text/javascript"
+            src="http://www.prepbootstrap.com/Content/shieldui-lite/dist/js/shieldui-lite-all.min.js"></script>
+
+    <script type="text/javascript" src="http://www.prepbootstrap.com/Content/data/shortGridData.js"></script>
+    <script type="text/javascript" src="/static/editor/editor.js"></script>
+{% endblock %}

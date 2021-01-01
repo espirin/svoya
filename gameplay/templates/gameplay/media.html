@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-<div style="position:relative; display: inline-block;">
+<div style="position:relative; display: inline-block;" id="videoContainer">
     <div class="hidelogo"
          style="position: absolute; left: 60px; top: 20px; width: 410px; height: 25px; z-index:999; background: #222; display: block;"></div>
     <div id="player"></div>
@@ -47,7 +47,8 @@
 
     function onStateChange(event) {
         if (event.data === 0) {
-            $("#player").hide();
+            player.destroy();
+            document.getElementById('videoContainer').style.display = 'none'
         }
         if (event.data === 2) {
             event.target.playVideo();
