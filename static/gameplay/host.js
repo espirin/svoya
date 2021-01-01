@@ -53,7 +53,7 @@ function update_state(state) {
     }
     if (state['state'] === 'COUNTDOWN') {
         showQuestion(state);
-        showCountdown(state['time']);
+        showCountdown(state['time'], state['time_remaining']);
     }
     if (state['state'] === 'ANSWERING') {
         hideCountdown();

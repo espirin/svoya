@@ -62,7 +62,8 @@ def get_game_state(game_id):
         question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
 
         return {
-            "time": game.temporary_state['countdown_time_remaining'],
+            "time": game.temporary_state['countdown_time'],
+            "time_remaining": game.temporary_state['countdown_time_remaining'],
             "state": GameState(game.state).name,
             "question": create_question_info(question)
         }

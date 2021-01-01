@@ -115,19 +115,23 @@ function showAnswer(state) {
     $('#questionText').text("Правильный ответ: " + state['question']['answer']);
 }
 
-function showCountdown(time) {
+function showCountdown(time, timeRemaining) {
     let countdown = $("#countdown");
     let countdownStripe = $("#countdownStripe");
-    countdownStripe.attr("style", "width: 0");
+    countdownStripe.attr("style", "width: " + Math.floor((time - timeRemaining) * 100 / time) + "%");
+    console.log(Math.floor((time - timeRemaining) * 100 / time));
     countdown.show();
     countdownStripe.animate({
         width: "100%"
-    }, time * 1000);
+    }, {
+        duration: timeRemaining,
+        easing: "linear"
+    });
 
     setTimeout(function () {
         $("#countdown").hide();
         socket.emit("end_countdown", gameID);
-    }, time * 1000)
+    }, timeRemaining)
 }
 
 function hideCountdown() {

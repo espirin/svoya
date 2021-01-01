@@ -50,6 +50,7 @@ def start_countdown(game_id):
 
     # Save temporary state
     game.temporary_state['countdown_winner'] = None
+    game.temporary_state['countdown_time'] = config.COUNTDOWN_DURATION
     game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
     game.temporary_state['countdown_time_remaining'] = config.COUNTDOWN_DURATION
     db.session.commit()
@@ -84,9 +85,8 @@ def answer_question(game_id):
 
     # Save winner
     game.temporary_state['countdown_winner'] = current_user.username
-    game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
     game.temporary_state['countdown_time_remaining'] -= \
-        (datetime.now() - datetime.fromisoformat(game.temporary_state['countdown_start_time'])).microseconds
+        (datetime.now() - datetime.fromisoformat(game.temporary_state['countdown_start_time'])).total_seconds() * 1000
 
     db.session.commit()
 
