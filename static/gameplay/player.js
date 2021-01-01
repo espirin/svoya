@@ -69,8 +69,10 @@ function showQuestion(state) {
 }
 
 function playVideo(state) {
-    $("#playerContainer").show();
-    loadVideo(state['question']['video_id'], state['question']['video_start'], state['question']['video_end']);
+    let container = $("#playerContainer");
+    container.show();
+    container.attr("src", "/media/" + state['question']['video_id'] + "/" + state['question']['video_start'] + "/"
+        + state['question']['video_end']);
 }
 
 function showImage(state) {

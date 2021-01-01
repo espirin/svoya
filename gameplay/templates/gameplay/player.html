@@ -20,11 +20,7 @@
             <div class="col-4"></div>
             <div class="col-4 text-center">
                 <h3 id="questionText"></h3>
-                <div style="position:relative; display: none;" id="playerContainer">
-                    <div class="hidelogo"
-                         style="position: absolute; left: 60px; top: 20px; width: 410px; height: 25px; z-index:999; background: #222; display: block;"></div>
-                     <div id="player"></div>
-                </div>
+                <iframe id="playerContainer" frameBorder="0" style="display: none; height: 325px; width: 510px"></iframe>
                 <img class="mb-3" style="display: none; height: 300px" id="image">
             </div>
         </div>
@@ -60,5 +56,4 @@
     <script src="/static/app/vendors/clipboard/clipboard.min.js"></script>
     <script src="/static/gameplay/shared.js"></script>
     <script src="/static/gameplay/player.js"></script>
-    <script src="/static/gameplay/media.js"></script>
 {% endblock %}
