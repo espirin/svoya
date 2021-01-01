@@ -1,3 +1,11 @@
 Flask
 Werkzeug
 shortuuid
+flask-socketio
+flask-login
+flask-sqlalchemy
+sentry-sdk
+blinker
+psycopg2-binary
+eventlet
+gunicorn
