@@ -18,11 +18,11 @@ function startCountdown() {
 }
 
 function correctAnswer() {
-    socket.emit("correct_answer", {"question_id": questionID, "game_id": gameID});
+    socket.emit("correct_answer", gameID);
 }
 
 function wrongAnswer() {
-    socket.emit("wrong_answer", {"question_id": questionID, "game_id": gameID});
+    socket.emit("wrong_answer", gameID);
 }
 
 function openBoard() {
@@ -42,9 +42,6 @@ socket.on("update_clients", function (clients) {
 });
 
 function update_state(state) {
-    if ("question" in state) {
-        questionID = state["question"]["id"]
-    }
     if (state['state'] === 'LOBBY') {
         $('#message').text("Лобби");
     }
@@ -53,6 +50,17 @@ function update_state(state) {
     }
     if (state['state'] === 'QUESTION') {
         showQuestion(state);
+    }
+    if (state['state'] === 'COUNTDOWN') {
+        showQuestion(state);
+        showCountdown(state['time']);
+    }
+    if (state['state'] === 'ANSWERING') {
+        hideCountdown();
+        showQuestion(state);
+    }
+    if (state['state'] === 'CORRECT_ANSWER') {
+        showAnswer(state);
     }
 }
 

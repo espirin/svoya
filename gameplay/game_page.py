@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from gameplay.state_handler import GameState
-from model import Game, User
+from model import Game, User, Pack
 from model.shared.shared import create_new_game_id
 
 game_page = Blueprint('gameplay', __name__, template_folder='templates')
@@ -16,8 +16,9 @@ game_page = Blueprint('gameplay', __name__, template_folder='templates')
 def create_game():
     pack_id = request.get_json()
     game_id = create_new_game_id()
+    pack = Pack.query.filter(Pack.id == pack_id).first()
 
-    game = Game(id=game_id, created=datetime.now(), pack_id=pack_id, state=GameState.LOBBY.value)
+    game = Game(id=game_id, created=datetime.now(), pack=pack, state=GameState.LOBBY.value)
     db.session.add(game)
     db.session.commit()
 
@@ -37,6 +38,8 @@ def get_game_page(game_id):
 
     game_url = f"{request.url_root}{game_id}"
     game = Game.query.filter(Game.id == game_id).first()
+    if game is None:
+        return "Игра не найдена"
     return render_template('gameplay/player.html', game_id=game_id, game_url=game_url, username=current_user.username,
                            pack_name=game.pack.name)
 

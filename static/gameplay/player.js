@@ -9,10 +9,6 @@ socket.on("connect", function () {
     });
 });
 
-function openQuestion(questionID) {
-    socket.emit("open_question", {"question_id": questionID, "game_id": gameID});
-}
-
 function answerQuestion() {
     socket.emit("answer_question", gameID, function (response) {
         if (response === "nope") {
@@ -26,10 +22,6 @@ function answerQuestion() {
     });
 }
 
-socket.on("test", function () {
-    console.log("test");
-});
-
 socket.on("state_update", function (state) {
     update_state(state)
 });
@@ -39,9 +31,6 @@ socket.on("update_clients", function (clients) {
 });
 
 function update_state(state) {
-    if ("question" in state) {
-        questionID = state["question"]["id"]
-    }
     if (state['state'] === 'LOBBY') {
         $('#message').text("Лобби");
     }

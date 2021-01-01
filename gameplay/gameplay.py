@@ -11,7 +11,6 @@ from model import Game, BoardProgress, Question
 @socketio.on('start_game', namespace='/host')
 @login_required
 def start_game(game_id):
-    print('hey')
     # Change game state to BOARD
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.BOARD.value
@@ -59,13 +58,10 @@ def start_countdown(game_id):
 
 @socketio.on('end_countdown', namespace='/player')
 @login_required
-def end_countdown(data):
-    question_id = data['question_id']
-    game_id = data['game_id']
-
+def end_countdown(game_id):
     # Change game state to CORRECT_ANSWER
     game = Game.query.filter(Game.id == game_id).first()
-    question = Question.query.filter(Question.id == question_id).first()
+    question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
     if game.state == GameState.COUNTDOWN.value:
         game.state = GameState.CORRECT_ANSWER.value
         game.current_board_progress.answered_questions.append(question)
@@ -100,12 +96,9 @@ def answer_question(game_id):
 
 @socketio.on('correct_answer', namespace='/host')
 @login_required
-def correct_answer(data):
-    question_id = data['question_id']
-    game_id = data['game_id']
-
+def correct_answer(game_id):
     game = Game.query.filter(Game.id == game_id).first()
-    question = Question.query.filter(Question.id == question_id).first()
+    question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
 
     # Add points
     game.scores[game.temporary_state['countdown_winner']] += question.price
@@ -123,12 +116,9 @@ def correct_answer(data):
 
 @socketio.on('wrong_answer', namespace='/host')
 @login_required
-def wrong_answer(data):
-    question_id = data['question_id']
-    game_id = data['game_id']
-
+def wrong_answer(game_id):
     game = Game.query.filter(Game.id == game_id).first()
-    question = Question.query.filter(Question.id == question_id).first()
+    question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
 
     # Subtract points
     game.scores[game.temporary_state['countdown_winner']] -= question.price

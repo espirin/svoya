@@ -74,8 +74,8 @@ def create_players_info(game) -> List[Dict]:
     for player in players:
         player['score'] = scores[player['username']]
         player['next_turn'] = game.next_turn == player
-        player['answering'] = 'answering' in game.temporary_state \
-                              and game.temporary_state['answering'] == player['username']
+        player['countdown_winner'] = 'countdown_winner' in game.temporary_state \
+                                     and game.temporary_state['countdown_winner'] == player['username']
 
     return players
 

@@ -1,7 +1,6 @@
 const generalSocket = io('/');
 new ClipboardJS('#copyURLButton');
 
-let questionID = null;
 let gameID = $("#gameID").text();
 
 setInterval(function () {
@@ -13,7 +12,7 @@ setInterval(function () {
 }, 2000);
 
 function openQuestion(questionID) {
-    generalSocket.emit("open_question", [questionID, gameID]);
+    socket.emit("open_question", {"game_id": gameID, "question_id": questionID});
 }
 
 function update_clients(clients) {
@@ -31,7 +30,7 @@ function update_clients(clients) {
                         .addClass("card-img-top")
                         .attr("src", "/static/app/images/bobr.jpg"))
                     .append($("<div></div>")
-                        .addClass(clients['players'][i]['answering']
+                        .addClass(clients['players'][i]['countdown_winner']
                             ? "card-body text-white bg-primary" : "card-body")
                         .append($("<div></div>")
                             .addClass("col")
@@ -113,19 +112,21 @@ function showBoard(state) {
 }
 
 function showAnswer(state) {
-    $('#questionText').text(state['question']['answer']);
+    $('#questionText').text("Правильный ответ: " + state['question']['answer']);
 }
 
 function showCountdown(time) {
     let countdown = $("#countdown");
+    let countdownStripe = $("#countdownStripe");
+    countdownStripe.attr("style", "width: 0");
     countdown.show();
-    $("#countdownStripe").animate({
+    countdownStripe.animate({
         width: "100%"
     }, time * 1000);
 
     setTimeout(function () {
         $("#countdown").hide();
-        socket.emit("end_countdown", {"game_id": gameID, "question_id": questionID});
+        socket.emit("end_countdown", gameID);
     }, time * 1000)
 }
 
