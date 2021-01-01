@@ -3,13 +3,11 @@ from app.index import index
 from auth.auth import auth
 from gameplay.game_page import game_page
 from browser.users_packs import user_packs
-from gameplay.media_handler import media_page
 import gameplay
 
 app.register_blueprint(auth)
 app.register_blueprint(index)
 app.register_blueprint(game_page)
-app.register_blueprint(media_page, url_prefix='/media')
 app.register_blueprint(user_packs, url_prefix='/user_packs')
 
 login_manager.init_app(app)

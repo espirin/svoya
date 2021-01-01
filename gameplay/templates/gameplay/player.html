@@ -18,7 +18,15 @@
         <div class="col mb-3" id="board"></div>
         <div class="row mb-3">
             <div class="col-4"></div>
-            <h3 class="col-4 text-center" id="questionText"></h3>
+            <div class="col-4 text-center">
+                <h3 id="questionText"></h3>
+                <div style="position:relative; display: none;" id="playerContainer">
+                    <div class="hidelogo"
+                         style="position: absolute; left: 60px; top: 20px; width: 410px; height: 25px; z-index:999; background: #222; display: block;"></div>
+                     <div id="player"></div>
+                </div>
+                <img class="mb-3" style="display: none; height: 300px" id="image">
+            </div>
         </div>
         <div class="col-xs-12 col-sm-12 progress-container" id="countdown" style="display:none">
             <div class="progress progress-striped active">
@@ -52,4 +60,5 @@
     <script src="/static/app/vendors/clipboard/clipboard.min.js"></script>
     <script src="/static/gameplay/shared.js"></script>
     <script src="/static/gameplay/player.js"></script>
+    <script src="/static/gameplay/media.js"></script>
 {% endblock %}

@@ -8,23 +8,22 @@ let player;
 
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
-        height: '390',
-        width: '640',
+        height: '300',
+        width: '492',
         videoId: $("#videoID").text(),
-        playerVars: {
+        playerlets: {
             'controls': 1,
             'showinfo': 0,
             'cc_load_policy': 0,
             'disablekb': 1,
-            'end': 50,
+            'end': $("#endTime").text(),
             'fs': 0,
             'iv_load_policy': 3,
             'modestbranding': 1,
             'playsinline': 1,
-            'start': 25
+            'start': $("#startTime").text(),
         },
         events: {
-            'onReady': onPlayerReady,
             'onStateChange': onStateChange
         }
     });

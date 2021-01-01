@@ -16,7 +16,6 @@ function openQuestion(questionID) {
 }
 
 function update_clients(clients) {
-    console.log(clients);
     const players = $('#playersCards');
     players.empty();
     $.each(clients['players'], function (i) {
