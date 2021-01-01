@@ -3,7 +3,7 @@ from typing import List, Dict
 
 from flask_login import login_required
 
-from app import socketio
+from app import socketio, db
 from model import Game, Question
 
 
@@ -33,6 +33,19 @@ def get_game_state(game_id):
         # Questions board
         board = game.current_board
         answered_questions = game.current_board_progress.answered_questions
+
+        # Check if board is done
+        done = True
+        for topic in board.topics:
+            for question in topic.questions:
+                if question not in answered_questions:
+                    done = False
+
+        # Select next board
+        if done and len(game.pack.boards) > game.pack.boards.index(game.current_board) + 1:
+            game.current_board = game.pack.boards[game.pack.boards.index(game.current_board) + 1]
+            db.session.commit()
+
         json_board = []
         for topic in board.topics:
             json_board.append({'name': topic.name, 'questions': []})
