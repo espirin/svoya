@@ -1,29 +1,55 @@
 {% extends "app/base.html" %}
 
 {% block body %}
-    <div class="container d-flex flex-column" style="min-height: 85vh">
-        <div class="row">
-            <div class="col">
-                <h4>{{ pack_id }}</h4>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="text-center">Bootstrap Editable Table <span class="fa fa-edit pull-right bigicon"></span>
-                    </h4>
-                </div>
-                <div class="panel-body text-center">
-                    <div id="grid"></div>
+    <div class="container">
+        <div class="col">
+            <h4 id="packID">Пак {{ pack_id }}</h4>
+            <div id="boards">
+                <ul class="nav nav-pills mb-2" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="routingProblemPill" data-toggle="pill" href="#rpTab" role="tab"
+                           aria-controls="rpTab" aria-selected="true">Экран 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="routesPill" data-toggle="pill" href="#routesTab" role="tab"
+                           aria-controls="routesTab" aria-selected="false">Экран 2</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="rpTab" role="tabpanel"
+                         aria-labelledby="routingProblemPill">
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <h5 class="card-title">Экран 1</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Тема 1</h5>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <form>
+                                                    <div class="row">
+                                                        <a style="display: none">questionID</a>
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="Вопрос">
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="Ответ">
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="видео">
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="картинка">
+                                                    </div>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <link rel="stylesheet" type="text/css"
-          href="http://www.prepbootstrap.com/Content/shieldui-lite/dist/css/light/all.min.css"/>
-    <script type="text/javascript"
-            src="http://www.prepbootstrap.com/Content/shieldui-lite/dist/js/shieldui-lite-all.min.js"></script>
+    </div>
 
-    <script type="text/javascript" src="http://www.prepbootstrap.com/Content/data/shortGridData.js"></script>
-    <script type="text/javascript" src="/static/editor/editor.js"></script>
 {% endblock %}
