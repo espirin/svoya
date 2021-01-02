@@ -41,29 +41,6 @@ socket.on("update_clients", function (clients) {
     update_clients(clients);
 });
 
-function update_state(state) {
-    if (state['state'] === 'LOBBY') {
-        $('#message').text("Лобби");
-    }
-    if (state['state'] === 'BOARD') {
-        showBoard(state);
-    }
-    if (state['state'] === 'QUESTION') {
-        showQuestion(state);
-    }
-    if (state['state'] === 'COUNTDOWN') {
-        showQuestion(state);
-        showCountdown(state['time'], state['time_remaining']);
-    }
-    if (state['state'] === 'ANSWERING') {
-        hideCountdown();
-        showQuestion(state);
-    }
-    if (state['state'] === 'CORRECT_ANSWER') {
-        showAnswer(state);
-    }
-}
-
 function showQuestion(state) {
     $('#board').hide();
     let questionText = $('#questionText');

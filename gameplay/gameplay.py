@@ -62,6 +62,8 @@ def start_countdown(game_id):
 def end_countdown(game_id):
     # Change game state to CORRECT_ANSWER
     game = Game.query.filter(Game.id == game_id).first()
+    if "question_id" not in game.temporary_state:
+        return
     question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
     if game.state == GameState.COUNTDOWN.value:
         game.state = GameState.CORRECT_ANSWER.value
@@ -147,8 +149,8 @@ def wrong_answer(game_id):
 def open_board(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.BOARD.value
-    db.session.commit()
     game.temporary_state.clear()
+    db.session.commit()
 
     # Update clients
     update_clients_state(game_id)

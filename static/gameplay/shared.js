@@ -118,22 +118,70 @@ function showCountdown(time, timeRemaining) {
     let countdown = $("#countdown");
     let countdownStripe = $("#countdownStripe");
     countdownStripe.attr("style", "width: " + Math.floor((time - timeRemaining) * 100 / time) + "%");
-    console.log(Math.floor((time - timeRemaining) * 100 / time));
     countdown.show();
     countdownStripe.animate({
         width: "100%"
     }, {
         duration: timeRemaining,
-        easing: "linear"
+        easing: "linear",
+        complete: function () {
+            $("#countdown").hide();
+            socket.emit("end_countdown", gameID);
+        }
     });
-
-    setTimeout(function () {
-        $("#countdown").hide();
-        socket.emit("end_countdown", gameID);
-    }, timeRemaining)
 }
 
 function hideCountdown() {
-    clearTimeout();
     $("#countdown").hide();
+    $("#countdownStripe").stop();
+}
+
+function playVideo(state) {
+    let container = $("#playerContainer");
+    container.show();
+    container.attr("src", "/media/" + state['question']['video_id'] + "/" + state['question']['video_start'] + "/"
+        + state['question']['video_end']);
+}
+
+function hideVideo() {
+    let player = $("#playerContainer");
+    player.attr("src", "about:blank");
+    player.hide();
+}
+
+function showImage(state) {
+    let image = $("#image");
+    image.attr("src", state["question"]["image_url"]);
+    image.show();
+}
+
+function update_state(state) {
+    if (state['state'] === 'LOBBY') {
+        $('#message').text("Лобби");
+    }
+    if (state['state'] === 'BOARD') {
+        $("#image").hide();
+        hideVideo();
+        showBoard(state);
+    }
+    if (state['state'] === 'QUESTION') {
+        showQuestion(state);
+        if (state['question']['video_id'] != null) playVideo(state);
+        if (state['question']['image_url'] != null) showImage(state);
+    }
+    if (state['state'] === 'COUNTDOWN') {
+        hideVideo();
+        showQuestion(state);
+        if (state['question']['image_url'] != null) showImage(state);
+        showCountdown(state['time'], state['time_remaining']);
+    }
+    if (state['state'] === 'ANSWERING') {
+        hideCountdown();
+        showQuestion(state);
+        if (state['question']['image_url'] != null) showImage(state);
+    }
+    if (state['state'] === 'CORRECT_ANSWER') {
+        showAnswer(state);
+        if (state['question']['image_url'] != null) showImage(state);
+    }
 }

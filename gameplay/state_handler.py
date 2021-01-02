@@ -45,6 +45,7 @@ def get_game_state(game_id):
         if done and len(game.pack.boards) > game.pack.boards.index(game.current_board) + 1:
             game.current_board = game.pack.boards[game.pack.boards.index(game.current_board) + 1]
             db.session.commit()
+            board = game.current_board
 
         json_board = []
         for topic in board.topics:
@@ -55,6 +56,7 @@ def get_game_state(game_id):
                     "answered": question in answered_questions,
                     "id": question.id
                 })
+            json_board[-1]['questions'].sort(key=lambda question_dict: question_dict['price'])
 
         return {
             "state": GameState(game.state).name,
