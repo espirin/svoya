@@ -36,3 +36,26 @@ function showQuestion(state) {
     questionText.show();
     questionText.text(state['question']['text']);
 }
+
+function showLobbyButtons() {
+}
+
+function showBoardButtons() {
+
+}
+
+function showQuestionButtons() {
+
+}
+
+function showCountdownButtons() {
+
+}
+
+function showAnswerButtons() {
+
+}
+
+function showCorrectAnswerButtons() {
+
+}

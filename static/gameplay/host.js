@@ -47,3 +47,33 @@ function showQuestion(state) {
     questionText.show();
     questionText.text(state['question']['text'] + "\n Ответ:" + state['question']['answer']);
 }
+
+function showLobbyButtons() {
+    $("#startGameButton").show();
+}
+
+function showBoardButtons() {
+    $("#openBoardButton").hide();
+    $("#startGameButton").hide();
+}
+
+function showQuestionButtons() {
+    $("#startTimerButton").show();
+}
+
+function showCountdownButtons() {
+    $("#startTimerButton").hide();
+    $("#correctAnswerButton").hide();
+    $("#wrongAnswerButton").hide();
+}
+
+function showAnswerButtons() {
+    $("#correctAnswerButton").show();
+    $("#wrongAnswerButton").show();
+}
+
+function showCorrectAnswerButtons() {
+    $("#openBoardButton").show();
+    $("#correctAnswerButton").hide();
+    $("#wrongAnswerButton").hide();
+}

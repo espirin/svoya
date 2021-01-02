@@ -13,15 +13,25 @@
                 <br>
                 <a class="btn btn-primary mt-2" href="/{{ game_id }}">Стать игроком</a>
                 <br>
-                <button class="btn btn-primary mt-2" onclick="startGame()">Начать игру</button>
+                <button class="btn btn-primary mt-2" onclick="startGame()" id="startGameButton" style="display: none">
+                    Начать игру
+                </button>
                 <br>
-                <button class="btn btn-primary mt-2" onclick="startCountdown()">Запустить таймер</button>
+                <button class="btn btn-primary mt-2" onclick="startCountdown()" id="startTimerButton"
+                        style="display: none">Запустить таймер
+                </button>
                 <br>
-                <button class="btn btn-primary mt-2" onclick="correctAnswer()">верный ответ</button>
+                <button class="btn btn-primary mt-2" onclick="correctAnswer()" id="correctAnswerButton"
+                        style="display: none">верный ответ
+                </button>
                 <br>
-                <button class="btn btn-primary mt-2" onclick="wrongAnswer()">неверный ответ</button>
+                <button class="btn btn-primary mt-2" onclick="wrongAnswer()" id="wrongAnswerButton"
+                        style="display: none">неверный ответ
+                </button>
                 <br>
-                <button class="btn btn-primary mt-2" onclick="openBoard()">открыть вопросы</button>
+                <button class="btn btn-primary mt-2" onclick="openBoard()" id="openBoardButton" style="display: none">
+                    открыть вопросы
+                </button>
                 <br>
                 <h4 id="message"></h4>
             </div>

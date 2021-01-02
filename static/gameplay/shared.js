@@ -158,30 +158,36 @@ function showImage(state) {
 function update_state(state) {
     if (state['state'] === 'LOBBY') {
         $('#message').text("Лобби");
+        showLobbyButtons();
     }
     if (state['state'] === 'BOARD') {
         $("#image").hide();
         hideVideo();
         showBoard(state);
+        showBoardButtons();
     }
     if (state['state'] === 'QUESTION') {
         showQuestion(state);
+        showQuestionButtons();
         if (state['question']['video_id'] != null) playVideo(state);
         if (state['question']['image_url'] != null) showImage(state);
     }
     if (state['state'] === 'COUNTDOWN') {
         hideVideo();
         showQuestion(state);
+        showCountdownButtons();
         if (state['question']['image_url'] != null) showImage(state);
         showCountdown(state['time'], state['time_remaining']);
     }
     if (state['state'] === 'ANSWERING') {
         hideCountdown();
         showQuestion(state);
+        showAnswerButtons();
         if (state['question']['image_url'] != null) showImage(state);
     }
     if (state['state'] === 'CORRECT_ANSWER') {
         showAnswer(state);
+        showCorrectAnswerButtons();
         if (state['question']['image_url'] != null) showImage(state);
     }
 }
