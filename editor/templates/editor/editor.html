@@ -20,11 +20,11 @@
                 <ul class="nav nav-pills mb-2" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="routingProblemPill" data-toggle="pill" href="#rpTab" role="tab"
-                           aria-controls="rpTab" aria-selected="true">Экран 1</a>
+                           aria-controls="rpTab" aria-selected="true">Раунд 1</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="routesPill" data-toggle="pill" href="#routesTab" role="tab"
-                           aria-controls="routesTab" aria-selected="false">Экран 2</a>
+                           aria-controls="routesTab" aria-selected="false">Раунд 2</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="pills-tabContent">
@@ -32,29 +32,56 @@
                          aria-labelledby="routingProblemPill">
                         <div class="card mt-2">
                             <div class="card-body">
-                                <h5 class="card-title">Экран 1</h5>
+                                <h5 class="card-title">Раунд 1</h5>
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title">Тема 1</h5>
                                         <ul class="list-group">
                                             <li class="list-group-item">
-                                                <form>
-                                                    <div class="row">
-                                                        <a style="display: none">questionID</a>
+                                                <div class="row" id="123">
+                                                    <form class="ml-2">
                                                         <input type="text" class="form-control col"
                                                                placeholder="Вопрос">
+                                                    </form>
+                                                    <form class="ml-2">
                                                         <input type="text" class="form-control col"
                                                                placeholder="Ответ">
+                                                    </form>
+                                                    <form class="ml-2">
                                                         <input type="text" class="form-control col"
                                                                placeholder="видео">
+                                                    </form>
+                                                    <form method="POST" action='/editor/upload_image'
+                                                          class="dropzone dz-clickable ml-2" enctype="multipart/form-data">
+                                                    </form>
+                                                </div>
+                                                <div class="row mt-5" id="123">
+                                                    <form class="ml-2">
                                                         <input type="text" class="form-control col"
-                                                               placeholder="картинка">
+                                                               placeholder="Вопрос">
+                                                    </form>
+                                                    <form class="ml-2">
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="Ответ">
+                                                    </form>
+                                                    <form class="ml-2">
+                                                        <input type="text" class="form-control col"
+                                                               placeholder="видео">
+                                                    </form>
+                                                    <div class="col ml-2">
+                                                        <div class="row justify-content-center"><img
+                                                                src="/static/images/user_content/8qoFJz8c8qU8KFVkyxGugeUJj7FbCHPm.png">
+                                                        </div>
+                                                        <div class="row justify-content-center">
+                                                            <button class="btn btn-danger"
+                                                                    onclick="removeImage(123)">
+                                                                Удалить
+                                                            </button>
+                                                        </div>
+
+
                                                     </div>
-                                                </form>
-                                                <form method="POST" action='/editor/upload_image'
-                                                      class="dropzone dz-clickable"
-                                                      id="dropper" enctype="multipart/form-data">
-                                                </form>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>
@@ -66,8 +93,7 @@
             </div>
         </div>
     </div>
-    <script type="application/javascript"
-            src="/static/editor/editor.js">
-    </script>
+    <script type="application/javascript" src="/static/editor/editor.js"></script>
+    <script type="application/javascript" src="/static/editor/uploader.js"></script>
 
 {% endblock %}

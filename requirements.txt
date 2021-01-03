@@ -9,5 +9,4 @@ blinker
 psycopg2-binary
 eventlet
 gunicorn
-rq
 pillow

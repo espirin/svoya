@@ -132,3 +132,4 @@ dmypy.json
 logger/logs
 config/secrets.py
 test.py
+/static/images/user_content

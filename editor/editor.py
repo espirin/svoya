@@ -1,9 +1,13 @@
+from typing import Dict
+
 from flask import Blueprint, render_template, request, jsonify, flash, redirect
 from flask_login import login_required, current_user
 
-from app import db, queue_manager
-from model import Pack
-from model.shared.shared import create_new_pack_id, allowed_image, create_new_image_id, get_file_extension
+from app import db, socketio
+from config import config
+from editor.videoprocessor.video_processor import check_video_embeddable
+from model import Pack, Question
+from model.shared.shared import create_new_pack_id, create_new_image_id, get_file_extension
 
 editor = Blueprint('editor', __name__, template_folder='templates')
 
@@ -33,8 +37,8 @@ def editor_page(pack_id):
 @editor.route('/upload_image', methods=['POST'])
 @login_required
 def upload_image():
-    if 'file' not in request.files:
-        flash('No file part')
+    if 'file' not in request.files or "question_id" not in request.form or request.form['question_id'] is None:
+        flash('No file part or question_id')
         return redirect(request.url)
 
     file = request.files['file']
@@ -42,15 +46,50 @@ def upload_image():
         flash('No selected file')
         return redirect(request.url)
 
-    if file and allowed_image(file.filename):
+    if file:
         image_id = create_new_image_id()
         extension = get_file_extension(file.filename)
-        path_to_image = f"static/images/tmp/{image_id}.{extension}"
-        path_to_optimized_image = f"static/images/user_content/{image_id}.{extension}"
-        with open(path_to_image, "wb") as f:
+        path = f"{config.IMAGES_DIR}/{image_id}.{extension}"
+        with open(path, "w") as f:
             f.write(file.read())
 
-        queue_manager.image_queue.enqueue("editor.imageprocessor.image_processor.process_and_save_image",
-                                          path_to_image, path_to_optimized_image, job_timeout="1m", job_id=image_id)
+        question = Question.query.filter(Question.id == request.form['question_id']).first()
+        question.image_url = path
 
-        return jsonify(image_id)
+        return jsonify(path)
+
+
+@socketio.on('update_question_text')
+@login_required
+def update_question_text(question_id: int, text: str):
+    question = Question.query.filter(Question.id == question_id).first()
+    question.text = text
+    db.session.commit()
+
+
+@socketio.on('update_question_answer')
+@login_required
+def update_question_answer(question_id: int, answer: str):
+    question = Question.query.filter(Question.id == question_id).first()
+    question.answer = answer
+    db.session.commit()
+
+
+@socketio.on('check_video')
+@login_required
+def check_video_handler(video_id: str) -> str:
+    if len(video_id) > 15:
+        return "video_id_too_long"
+    if check_video_embeddable(video_id):
+        return "ok"
+    return "not_embeddable"
+
+
+@socketio.on('update_video')
+@login_required
+def update_video(question_id: int, data: Dict):
+    question = Question.query.filter(Question.id == question_id).first()
+    question.video_id = data['video_id']
+    question.video_start = data['video_start']
+    question.video_end = data['video_end']
+    db.session.commit()
