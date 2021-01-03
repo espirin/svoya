@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app import db, socketio
 from config import config
 from editor.videoprocessor.video_processor import check_video_embeddable
-from model import Pack, Question
+from model import Pack, Question, Board
 from model.shared.shared import create_new_pack_id, create_new_image_id, get_file_extension
 
 editor = Blueprint('editor', __name__, template_folder='templates')
@@ -31,7 +31,7 @@ def editor_page(pack_id):
     pack = Pack.query.filter(Pack.id == pack_id).first()
     if pack is None:
         return "Пак не найден"
-    return render_template('editor/editor.html', pack_id=pack_id)
+    return render_template('editor/editor.html', pack_id=pack_id, pack_name=pack.name)
 
 
 @editor.route('/upload_image', methods=['POST'])
@@ -93,3 +93,35 @@ def update_video(question_id: int, data: Dict):
     question.video_start = data['video_start']
     question.video_end = data['video_end']
     db.session.commit()
+
+
+@socketio.on('get_boards')
+@login_required
+def get_boards(pack_id: int):
+    pack = Pack.query.filter(Pack.id == pack_id).first()
+    boards = [{"name": board.name, "id": board.id} for board in pack.boards]
+    return boards
+
+
+@socketio.on('get_board')
+@login_required
+def get_board(board_id: int):
+    board = Board.query.filter(Board.id == board_id).first()
+    board = {
+        "id": board.id,
+        "name": board.name,
+        "topics": [{
+            "name": topic.name,
+            "id": topic.id,
+            "questions": [{
+                "id": question.id,
+                "text": question.text,
+                "answer": question.answer,
+                "image_url": question.image_url,
+                "video_id": question.video_id,
+                "video_start": question.video_start,
+                "video_end": question.video_end
+            } for question in topic.questions]
+        } for topic in board.topics],
+    }
+    return board
