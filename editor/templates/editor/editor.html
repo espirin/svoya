@@ -1,5 +1,17 @@
 {% extends "app/base.html" %}
 
+{% block head %}
+    <link rel="stylesheet"
+          href="/static/vendors/dropzone/dropzone.min.css"/>
+
+    <link rel="stylesheet"
+          href="/static/vendors/dropzone/basic.css"/>
+
+    <script type="application/javascript"
+            src="/static/vendors/dropzone/dropzone.min.js">
+    </script>
+{% endblock %}
+
 {% block body %}
     <div class="container">
         <div class="col">
@@ -39,6 +51,10 @@
                                                                placeholder="картинка">
                                                     </div>
                                                 </form>
+                                                <form method="POST" action='/editor/upload_image'
+                                                      class="dropzone dz-clickable"
+                                                      id="dropper" enctype="multipart/form-data">
+                                                </form>
                                             </li>
                                         </ul>
                                     </div>
@@ -50,6 +66,8 @@
             </div>
         </div>
     </div>
-    </div>
+    <script type="application/javascript"
+            src="/static/editor/editor.js">
+    </script>
 
 {% endblock %}

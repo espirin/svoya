@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, queue_manager
 from model import Pack
-from model.shared.shared import create_new_pack_id
+from model.shared.shared import create_new_pack_id, allowed_image, create_new_image_id, get_file_extension
 
 editor = Blueprint('editor', __name__, template_folder='templates')
 
@@ -28,3 +28,29 @@ def editor_page(pack_id):
     if pack is None:
         return "Пак не найден"
     return render_template('editor/editor.html', pack_id=pack_id)
+
+
+@editor.route('/upload_image', methods=['POST'])
+@login_required
+def upload_image():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+
+    if file and allowed_image(file.filename):
+        image_id = create_new_image_id()
+        extension = get_file_extension(file.filename)
+        path_to_image = f"static/images/tmp/{image_id}.{extension}"
+        path_to_optimized_image = f"static/images/user_content/{image_id}.{extension}"
+        with open(path_to_image, "wb") as f:
+            f.write(file.read())
+
+        queue_manager.image_queue.enqueue("editor.imageprocessor.image_processor.process_and_save_image",
+                                          path_to_image, path_to_optimized_image, job_timeout="1m", job_id=image_id)
+
+        return jsonify(image_id)

@@ -1,1 +1,5 @@
 COUNTDOWN_DURATION = 8000  # ms
+DATA_DIR = "static/images"
+ALLOWED_IMAGE_EXTENSIONS = {"jpeg", "jpg", "png"}
+IMAGE_SIZE = (160, 300)
+IMAGE_QUALITY = 90

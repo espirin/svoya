@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import secrets
 from logger.logger import setup_logging
+from queuemanager.queue_manager import QueueManager
 
 app = Flask(__name__, static_folder="../static")
 app.config['SECRET_KEY'] = secrets.SECRET_KEY
@@ -17,6 +18,7 @@ logger = setup_logging()
 login_manager = LoginManager()
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
+queue_manager = QueueManager()
 
 
 @app.context_processor
