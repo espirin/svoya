@@ -58,19 +58,19 @@ $(function () {
                                     .attr("id", topic['id']))
                                 .append($("<ul></ul>")
                                     .addClass("list-group")
-                                    .attr("id", topic['id'] + "QuestionsList"))));
+                                    .attr("id", "QuestionsList" + topic['id']))));
 
                 for (const question of topic['questions']) {
-                    $("#" + topic['id'] + "QuestionsList").append(
+                    $("#" + "QuestionsList" + topic['id']).append(
                         $("<li></li>").addClass("list-group-item").append(
                             $("<div></div>")
                                 .addClass("row question align-items-center")
-                                .attr("id", question['id'] + "QuestionsRow").append(
+                                .attr("id", "QuestionsRow" + question['id']).append(
                                 $("<form></form>")
                                     .addClass("col h-100")
                                     .append($("<textarea>")
                                         .attr("rows", "3")
-                                        .attr("id", question['id'] + "QuestionText")
+                                        .attr("id", "QuestionText" + question['id'])
                                         .addClass("form-control h-100")
                                         .attr("placeholder", "Вопрос")
                                         .val(question['text']))).append(
@@ -78,20 +78,23 @@ $(function () {
                                     .addClass("ml-2 col h-100")
                                     .append($("<textarea>")
                                         .attr("rows", "3")
-                                        .attr("id", question['id'] + "QuestionAnswer")
+                                        .attr("id", "QuestionAnswer" + question['id'])
                                         .addClass("form-control h-100")
                                         .attr("placeholder", "Ответ")
                                         .val(question['answer'])))));
 
+                    let questionsRow = $("#" + "QuestionsRow" + question['id']);
+
+                    // Video
                     if (question['video_id'] == null) {
-                        $("#" + question['id'] + "QuestionsRow").append(
+                        questionsRow.append(
                             $("<div></div>").addClass("col text-center").append(
                                 $("<button></button>")
                                     .addClass("btn btn-secondary")
                                     .text("Добавить видео")
                                     .attr("onclick", "viewVideoInfo(" + question['id'] + ")")));
                     } else {
-                        $("#" + question['id'] + "QuestionsRow").append(
+                        questionsRow.append(
                             $("<div></div>")
                                 .addClass("col h-100")
                                 .append(
@@ -101,18 +104,64 @@ $(function () {
                                         .addClass("h-100 rounded mx-auto d-block")));
                     }
 
+                    // Image
                     if (question['image_url'] == null) {
-                        $("#" + question['id'] + "QuestionsRow").append(
+                        questionsRow.append(
                             $("<div></div>")
-                                .addClass("col ml-2 mr-2 h-100")
-                                .append(
-                                    $("<div></div>")
-                                        .addClass("dropzone h-100")
-                                        .attr("id", question['id'] + "Dropzone")
-                                        .attr("action", '/editor/upload_image')));
+                                .addClass("col ml-2 text-center")
+                                .append($("<button></button>")
+                                    .addClass("btn btn-primary")
+                                    .attr("type", "button")
+                                    .attr("data-bs-toggle", "modal")
+                                    .attr("data-bs-target", "#" + "ModalDropzone" + question['id'])
+                                    .text("Загрузить")));
 
-                        $("#" + question['id'] + "Dropzone").dropzone(
+                        questionsRow.append($("<div></div>")
+                            .addClass("modal fade")
+                            .attr("id", "ModalDropzone" + question['id'])
+                            .attr("tabindex", "-1")
+                            .attr("aria-labelledby", "ModalDropzoneLabel" + question['id'])
+                            .attr("aria-hidden", "true")
+                            .append(
+                                $("<div></div>")
+                                    .addClass("modal-dialog")
+                                    .append(
+                                        $("<div></div>")
+                                            .addClass("modal-content")
+                                            .append(
+                                                $("<div></div>")
+                                                    .addClass("modal-header")
+                                                    .append(
+                                                        $("<h5></h5>")
+                                                            .addClass("modal-title")
+                                                            .attr("id", "ModalDropzoneLabel" + question['id'])
+                                                            .text("Добавь картинку"))
+                                                    .append(
+                                                        $("<button></button>")
+                                                            .addClass("btn-close")
+                                                            .attr("type", "button")
+                                                            .attr("data-bs-dismiss", "modal")
+                                                            .attr("aria-label", "Закрыть")))
+                                            .append(
+                                                $("<div></div>")
+                                                    .addClass("modal-body")
+                                                    .append(
+                                                        $("<div></div>")
+                                                            .attr("id", "Dropzone" + question['id'])
+                                                            .addClass("dropzone")))
+                                            .append(
+                                                $("<div></div>")
+                                                    .addClass("modal-footer")
+                                                    .append(
+                                                        $("<button></button>")
+                                                            .addClass("btn btn-secondary")
+                                                            .attr("type", "button")
+                                                            .attr("data-bs-dismiss", "modal")
+                                                            .text("Закрыть"))))));
+
+                        $("#" + "Dropzone" + question['id']).dropzone(
                             {
+                                url: "/editor/upload_image",
                                 paramName: 'file',
                                 chunking: false,
                                 maxFilesize: 10,
@@ -130,7 +179,7 @@ $(function () {
                                 }
                             })
                     } else {
-                        $("#" + question['id'] + "QuestionsRow")
+                        questionsRow
                             .append($("<div></div>")
                                 .addClass("col text-center")
                                 .append($("<img>")
@@ -148,90 +197,6 @@ $(function () {
 })
 
 
-//{
-//     paramName: 'file',
-//     chunking: false,
-//     url: '/editor/upload_image',
-//     maxFilesize: 10,
-//     maxFiles: 1,
-//     acceptedFiles: "image/*",
-//     resizeQuality: 0.8,
-//     resizeWidth: 300,
-//     init: function () {
-//         this.on("success", function (file, response) {
-//
-//         })
-//         this.on("sending", function (file, xhr, formData) {
-//             formData.append("question_id", "loremipsum");
-//         });
-//     }
-// }
-
-
-//    <div class="tab-pane fade show active" id="rpTab" role="tabpanel"
-//                          aria-labelledby="routingProblemPill">
-//                         <div class="card mt-2">
-//                             <div class="card-body">
-//                                 <h5 class="card-title">Раунд 1</h5>
-//                                 <div class="card">
-//                                     <div class="card-body">
-//                                         <h5 class="card-title">Тема 1</h5>
-//                                         <ul class="list-group">
-//                                             <li class="list-group-item">
-//
-//                                             </li>
-//                                         </ul>
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-
-
-//<div class="row" id="123">
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="Вопрос">
-//                                                     </form>
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="Ответ">
-//                                                     </form>
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="видео">
-//                                                     </form>
-//                                                     <form method="POST" action='/editor/upload_image'
-//                                                           class="dropzone dz-clickable ml-2"
-//                                                           enctype="multipart/form-data">
-//                                                     </form>
-//                                                 </div>
-//                                                 <div class="row mt-5" id="123">
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="Вопрос">
-//                                                     </form>
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="Ответ">
-//                                                     </form>
-//                                                     <form class="ml-2">
-//                                                         <input type="text" class="form-control col"
-//                                                                placeholder="видео">
-//                                                     </form>
-//                                                     <div class="col ml-2">
-//                                                         <div class="row justify-content-center"><img
-//                                                                 src="/static/images/user_content/8qoFJz8c8qU8KFVkyxGugeUJj7FbCHPm.png">
-//                                                         </div>
-//                                                         <div class="row justify-content-center">
-//                                                             <button class="btn btn-danger"
-//                                                                     onclick="removeImage(123)">
-//                                                                 Удалить
-//                                                             </button>
-//                                                         </div>
-//                                                     </div>
-//                                                 </div>
-
 // $('.the-textarea').on('input propertychange change', function() {
 //     console.log('Textarea Change');
 //
@@ -241,24 +206,3 @@ $(function () {
 //         saveToDB();
 //     }, 1000);
 // });
-
-
-//$("div#myId").dropzone({ url: "/file/post" });
-//{
-//     paramName: 'file',
-//     chunking: false,
-//     url: '/editor/upload_image',
-//     maxFilesize: 10,
-//     maxFiles: 1,
-//     acceptedFiles: "image/*",
-//     resizeQuality: 0.8,
-//     resizeWidth: 300,
-//     init: function () {
-//         this.on("success", function (file, response) {
-//
-//         })
-//         this.on("sending", function (file, xhr, formData) {
-//             formData.append("question_id", "loremipsum");
-//         });
-//     }
-// }

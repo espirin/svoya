@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app import db, socketio
 from config import config
 from editor.videoprocessor.video_processor import check_video_embeddable
-from model import Pack, Question, Board
+from model import Pack, Question
 from model.shared.shared import create_new_pack_id, create_new_image_id, get_file_extension
 
 editor = Blueprint('editor', __name__, template_folder='templates')
@@ -50,11 +50,12 @@ def upload_image():
         image_id = create_new_image_id()
         extension = get_file_extension(file.filename)
         path = f"{config.IMAGES_DIR}/{image_id}.{extension}"
-        with open(path, "w") as f:
+        with open(path, "wb") as f:
             f.write(file.read())
 
         question = Question.query.filter(Question.id == request.form['question_id']).first()
         question.image_url = path
+        db.session.commit()
 
         return jsonify(path)
 
