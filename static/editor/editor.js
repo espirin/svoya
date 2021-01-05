@@ -10,7 +10,7 @@ function removeImage(questionID) {
     });
 }
 
-$(document).ready(function () {
+$(function () {
     Dropzone.autoDiscover = false;
 
     socket.emit("get_boards", packID, function (boards) {
@@ -67,19 +67,19 @@ $(document).ready(function () {
                                 .addClass("row question align-items-center")
                                 .attr("id", question['id'] + "QuestionsRow").append(
                                 $("<form></form>")
-                                    .addClass("ml-2 col")
-                                    .append($("<input>")
-                                        .attr("type", "text")
+                                    .addClass("col h-100")
+                                    .append($("<textarea>")
+                                        .attr("rows", "3")
                                         .attr("id", question['id'] + "QuestionText")
-                                        .addClass("form-control")
+                                        .addClass("form-control h-100")
                                         .attr("placeholder", "Вопрос")
                                         .val(question['text']))).append(
                                 $("<form></form>")
-                                    .addClass("ml-2 col")
-                                    .append($("<input>")
-                                        .attr("type", "text")
+                                    .addClass("ml-2 col h-100")
+                                    .append($("<textarea>")
+                                        .attr("rows", "3")
                                         .attr("id", question['id'] + "QuestionAnswer")
-                                        .addClass("form-control")
+                                        .addClass("form-control h-100")
                                         .attr("placeholder", "Ответ")
                                         .val(question['answer'])))));
 
@@ -93,40 +93,43 @@ $(document).ready(function () {
                     } else {
                         $("#" + question['id'] + "QuestionsRow").append(
                             $("<div></div>")
-                                .addClass("col")
+                                .addClass("col h-100")
                                 .append(
                                     $("<img>")
                                         .attr("src", "https://img.youtube.com/vi/" + question['video_id'] + "/mqdefault.jpg")
                                         .attr("onclick", "viewVideoInfo(" + question['id'] + ")")
-                                        .addClass("editor-video-image rounded mx-auto d-block")));
+                                        .addClass("h-100 rounded mx-auto d-block")));
                     }
 
                     if (question['image_url'] == null) {
                         $("#" + question['id'] + "QuestionsRow").append(
                             $("<div></div>")
-                                .addClass("col")
-                                .attr("id", question['id'] + "Dropzone"));
+                                .addClass("col ml-2 mr-2 h-100")
+                                .append(
+                                    $("<div></div>")
+                                        .addClass("dropzone h-100")
+                                        .attr("id", question['id'] + "Dropzone")
+                                        .attr("action", '/editor/upload_image')));
 
-                        new Dropzone($("#" + question['id'] + "Dropzone").get(0), {
-                            paramName: 'file',
-                            chunking: false,
-                            url: '/editor/upload_image',
-                            maxFilesize: 10,
-                            maxFiles: 1,
-                            acceptedFiles: "image/*",
-                            resizeQuality: 0.8,
-                            resizeWidth: 300,
-                            init: function () {
-                                this.on("success", function (file, response) {
+                        $("#" + question['id'] + "Dropzone").dropzone(
+                            {
+                                paramName: 'file',
+                                chunking: false,
+                                maxFilesize: 10,
+                                maxFiles: 1,
+                                acceptedFiles: "image/*",
+                                resizeQuality: 0.8,
+                                resizeWidth: 300,
+                                init: function () {
+                                    this.on("success", function (file, response) {
 
-                                })
-                                this.on("sending", function (file, xhr, formData) {
-                                    formData.append("question_id", question['id']);
-                                });
-                            }
-                        });
+                                    })
+                                    this.on("sending", function (file, xhr, formData) {
+                                        formData.append("question_id", question['id']);
+                                    });
+                                }
+                            })
                     } else {
-                        console.log(question['image_url'])
                         $("#" + question['id'] + "QuestionsRow")
                             .append($("<div></div>")
                                 .addClass("col text-center")
