@@ -27,3 +27,15 @@
     color: #5CB85C;
     font-size: 20px;
 }
+
+.editor-video-image {
+    height: 90px;
+}
+
+.editor-image {
+    height: 60px;
+}
+
+.question {
+    height: 100px;
+}

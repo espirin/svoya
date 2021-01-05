@@ -99,15 +99,7 @@ def update_video(question_id: int, data: Dict):
 @login_required
 def get_boards(pack_id: int):
     pack = Pack.query.filter(Pack.id == pack_id).first()
-    boards = [{"name": board.name, "id": board.id} for board in pack.boards]
-    return boards
-
-
-@socketio.on('get_board')
-@login_required
-def get_board(board_id: int):
-    board = Board.query.filter(Board.id == board_id).first()
-    board = {
+    boards = [{
         "id": board.id,
         "name": board.name,
         "topics": [{
@@ -123,5 +115,5 @@ def get_board(board_id: int):
                 "video_end": question.video_end
             } for question in topic.questions]
         } for topic in board.topics],
-    }
-    return board
+    } for board in pack.boards]
+    return boards
