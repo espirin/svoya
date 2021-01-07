@@ -44,14 +44,15 @@
     -ms-transform: translate(-50%, -50%);
 }
 
-.image-x:hover + .hide-button {
-    display: block;
-}
-
-.hide-button:hover {
-    display: block;
-}
-
 .hide-button {
     display: none;
 }
+
+.x-image:hover > img{
+    opacity: 0.4;
+}
+
+.x-image:hover > .hide-button{
+    display: block;
+}
+

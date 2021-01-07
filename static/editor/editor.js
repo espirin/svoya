@@ -137,7 +137,7 @@ $(function () {
 
                     // Image
                     let imageColumn = $("<div></div>")
-                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center")
+                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center x-image")
                         .attr("style", "position:relative; display:inline-block")
                         .attr("id", "imageColumn" + question['id']);
                     questionsRow.append(imageColumn);
@@ -172,7 +172,7 @@ function addImagePreview(element, url, questionID) {
     element
         .append($("<img>")
             .attr("src", url)
-            .addClass("rounded mx-auto d-block h-100 max-width-100 image-x"));
+            .addClass("rounded mx-auto d-block h-100 max-width-100"));
     element
         .append($("<button></button>")
             .addClass("btn-close x-icon hide-button")
