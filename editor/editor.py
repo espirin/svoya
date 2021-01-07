@@ -67,7 +67,9 @@ def upload_image():
 
 @socketio.on('update_question_text')
 @login_required
-def update_question_text(question_id: int, text: str):
+def update_question_text(data: Dict):
+    question_id = data['question_id']
+    text = data['text']
     question = Question.query.filter(Question.id == question_id).first()
     question.text = text
     db.session.commit()
@@ -75,9 +77,21 @@ def update_question_text(question_id: int, text: str):
 
 @socketio.on('update_question_answer')
 @login_required
-def update_question_answer(question_id: int, answer: str):
+def update_question_answer(data: Dict):
+    question_id = data['question_id']
+    answer = data['answer']
     question = Question.query.filter(Question.id == question_id).first()
     question.answer = answer
+    db.session.commit()
+
+
+@socketio.on('update_question_price')
+@login_required
+def update_question_price(data: Dict):
+    question_id = data['question_id']
+    price = data['price']
+    question = Question.query.filter(Question.id == question_id).first()
+    question.price = price
     db.session.commit()
 
 
@@ -115,6 +129,7 @@ def get_boards(pack_id: int):
                 "id": question.id,
                 "text": question.text,
                 "answer": question.answer,
+                "price": question.price,
                 "image_url": f"/{question.image_thumbnail_url}" if question.image_url is not None else None,
                 "video_id": question.video_id,
                 "video_start": question.video_start,

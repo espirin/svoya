@@ -59,20 +59,68 @@ $(function () {
                                 .attr("id", "QuestionsRow" + question['id']).append(
                                 $("<form></form>")
                                     .addClass("col h-100")
-                                    .append($("<textarea>")
-                                        .attr("rows", "3")
-                                        .attr("id", "QuestionText" + question['id'])
-                                        .addClass("form-control h-100")
-                                        .attr("placeholder", "Вопрос")
-                                        .val(question['text']))).append(
+                                    .append(
+                                        $("<textarea>")
+                                            .attr("rows", "3")
+                                            .attr("id", "QuestionText" + question['id'])
+                                            .addClass("form-control h-100")
+                                            .attr("placeholder", "Вопрос")
+                                            .val(question['text'])
+                                            .on("input propertychange change", function () {
+                                                try {
+                                                    clearTimeout(timeoutId);
+                                                } catch {
+                                                }
+                                                timeoutId = setTimeout(function () {
+                                                    socket.emit("update_question_text", {
+                                                        "question_id": question['id'],
+                                                        "text": $("#QuestionText" + question['id']).val()
+                                                    });
+                                                }, 500);
+                                            }))).append(
                                 $("<form></form>")
                                     .addClass("ml-2 col h-100")
-                                    .append($("<textarea>")
-                                        .attr("rows", "3")
-                                        .attr("id", "QuestionAnswer" + question['id'])
-                                        .addClass("form-control h-100")
-                                        .attr("placeholder", "Ответ")
-                                        .val(question['answer'])))));
+                                    .append(
+                                        $("<textarea>")
+                                            .attr("rows", "3")
+                                            .attr("id", "QuestionAnswer" + question['id'])
+                                            .addClass("form-control h-100")
+                                            .attr("placeholder", "Ответ")
+                                            .val(question['answer'])
+                                            .on("input propertychange change", function () {
+                                                try {
+                                                    clearTimeout(timeoutId);
+                                                } catch {
+                                                }
+                                                timeoutId = setTimeout(function () {
+                                                    socket.emit("update_question_answer", {
+                                                        "question_id": question['id'],
+                                                        "answer": $("#QuestionAnswer" + question['id']).val()
+                                                    });
+                                                }, 500);
+                                            }))).append(
+                                $("<form></form>")
+                                    .addClass("ml-2 col h-100")
+                                    .append(
+                                        $("<input>")
+                                            .attr("id", "QuestionPrice" + question['id'])
+                                            .attr("type", "number")
+                                            .attr("min", "0")
+                                            .addClass("form-control h-100")
+                                            .attr("placeholder", "100")
+                                            .val(question['price'])
+                                            .on("input propertychange change", function () {
+                                                try {
+                                                    clearTimeout(timeoutId);
+                                                } catch {
+                                                }
+                                                timeoutId = setTimeout(function () {
+                                                    socket.emit("update_question_price", {
+                                                        "question_id": question['id'],
+                                                        "price": $("#QuestionPrice" + question['id']).val()
+                                                    });
+                                                }, 500);
+                                            })))));
 
                     let questionsRow = $("#" + "QuestionsRow" + question['id']);
 
@@ -216,13 +264,3 @@ function removeImage(questionID) {
         }
     });
 }
-
-// $('.the-textarea').on('input propertychange change', function() {
-//     console.log('Textarea Change');
-//
-//     clearTimeout(timeoutId);
-//     timeoutId = setTimeout(function() {
-//         // Runs 1 second (1000 ms) after the last change
-//         saveToDB();
-//     }, 1000);
-// });
