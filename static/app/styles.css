@@ -28,16 +28,30 @@
     font-size: 20px;
 }
 
-.editor-video-image {
-    height: 90px;
-}
-
-.editor-image {
-    height: 60px;
-}
-
 .question {
     height: 70px;
 }
 
+.max-width-100 {
+    max-width: 100%;
+}
 
+.x-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.image-x:hover + .hide-button {
+    display: block;
+}
+
+.hide-button:hover {
+    display: block;
+}
+
+.hide-button {
+    display: none;
+}

@@ -1,15 +1,6 @@
 const socket = io();
 let packID = $("#packID").text();
 
-function removeImage(questionID) {
-    socket.emit("remove_image", questionID, function (response) {
-        if (response === "success") {
-            //    remove image, put form
-            //     $("#" + questionID).
-        }
-    });
-}
-
 $(function () {
     Dropzone.autoDiscover = false;
 
@@ -86,109 +77,26 @@ $(function () {
                     let questionsRow = $("#" + "QuestionsRow" + question['id']);
 
                     // Video
+                    let videoColumn = $("<div></div>")
+                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center")
+                        .attr("id", "videoColumn" + question['id']);
+                    questionsRow.append(videoColumn);
                     if (question['video_id'] == null) {
-                        questionsRow.append(
-                            $("<div></div>").addClass("col text-center").append(
-                                $("<button></button>")
-                                    .addClass("btn btn-secondary")
-                                    .text("Добавить видео")
-                                    .attr("onclick", "viewVideoInfo(" + question['id'] + ")")));
+                        addAddVideoButton(videoColumn, question['id']);
                     } else {
-                        questionsRow.append(
-                            $("<div></div>")
-                                .addClass("col h-100")
-                                .append(
-                                    $("<img>")
-                                        .attr("src", "https://img.youtube.com/vi/" + question['video_id'] + "/mqdefault.jpg")
-                                        .attr("onclick", "viewVideoInfo(" + question['id'] + ")")
-                                        .addClass("h-100 rounded mx-auto d-block")));
+                        addVideoPreview(videoColumn, question['video_id'], question['id']);
                     }
 
                     // Image
+                    let imageColumn = $("<div></div>")
+                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center")
+                        .attr("style", "position:relative; display:inline-block")
+                        .attr("id", "imageColumn" + question['id']);
+                    questionsRow.append(imageColumn);
                     if (question['image_url'] == null) {
-                        questionsRow.append(
-                            $("<div></div>")
-                                .addClass("col ml-2 text-center")
-                                .append($("<button></button>")
-                                    .addClass("btn btn-primary")
-                                    .attr("type", "button")
-                                    .attr("data-bs-toggle", "modal")
-                                    .attr("data-bs-target", "#" + "ModalDropzone" + question['id'])
-                                    .text("Загрузить")));
-
-                        questionsRow.append($("<div></div>")
-                            .addClass("modal fade")
-                            .attr("id", "ModalDropzone" + question['id'])
-                            .attr("tabindex", "-1")
-                            .attr("aria-labelledby", "ModalDropzoneLabel" + question['id'])
-                            .attr("aria-hidden", "true")
-                            .append(
-                                $("<div></div>")
-                                    .addClass("modal-dialog")
-                                    .append(
-                                        $("<div></div>")
-                                            .addClass("modal-content")
-                                            .append(
-                                                $("<div></div>")
-                                                    .addClass("modal-header")
-                                                    .append(
-                                                        $("<h5></h5>")
-                                                            .addClass("modal-title")
-                                                            .attr("id", "ModalDropzoneLabel" + question['id'])
-                                                            .text("Добавь картинку"))
-                                                    .append(
-                                                        $("<button></button>")
-                                                            .addClass("btn-close")
-                                                            .attr("type", "button")
-                                                            .attr("data-bs-dismiss", "modal")
-                                                            .attr("aria-label", "Закрыть")))
-                                            .append(
-                                                $("<div></div>")
-                                                    .addClass("modal-body")
-                                                    .append(
-                                                        $("<div></div>")
-                                                            .attr("id", "Dropzone" + question['id'])
-                                                            .addClass("dropzone")))
-                                            .append(
-                                                $("<div></div>")
-                                                    .addClass("modal-footer")
-                                                    .append(
-                                                        $("<button></button>")
-                                                            .addClass("btn btn-secondary")
-                                                            .attr("type", "button")
-                                                            .attr("data-bs-dismiss", "modal")
-                                                            .text("Закрыть"))))));
-
-                        $("#" + "Dropzone" + question['id']).dropzone(
-                            {
-                                url: "/editor/upload_image",
-                                paramName: 'file',
-                                chunking: false,
-                                maxFilesize: 10,
-                                maxFiles: 1,
-                                acceptedFiles: "image/*",
-                                resizeQuality: 0.8,
-                                resizeWidth: 300,
-                                init: function () {
-                                    this.on("success", function (file, response) {
-
-                                    })
-                                    this.on("sending", function (file, xhr, formData) {
-                                        formData.append("question_id", question['id']);
-                                    });
-                                }
-                            })
+                        addModalImageDropzone(imageColumn, question['id']);
                     } else {
-                        questionsRow
-                            .append($("<div></div>")
-                                .addClass("col text-center")
-                                .append($("<img>")
-                                    .attr("src", question['image_url'])
-                                    .addClass("editor-image row rounded mx-auto d-block"))
-                                .append($("<button></button>")
-                                    .addClass("btn btn-danger row mt-2")
-                                    .attr("onclick", "removeImage(" + question['id'] + ")")
-                                    .text("Удалить")));
+                        addImagePreview(imageColumn, question['image_url'], question['id']);
                     }
                 }
             }
@@ -196,6 +104,118 @@ $(function () {
     })
 })
 
+function addAddVideoButton(element, questionID) {
+    element.append(
+        $("<button></button>")
+            .addClass("btn btn-secondary")
+            .text("Добавить")
+            .attr("onclick", "viewVideoInfo(" + questionID + ")"));
+}
+
+function addVideoPreview(element, videoID, questionID) {
+    element
+        .append($("<img>")
+            .attr("src", "https://img.youtube.com/vi/" + videoID + "/mqdefault.jpg")
+            .attr("onclick", "viewVideoInfo(" + questionID + ")")
+            .addClass("rounded mx-auto d-block h-100 max-width-100"));
+}
+
+function addImagePreview(element, url, questionID) {
+    element
+        .append($("<img>")
+            .attr("src", url)
+            .addClass("rounded mx-auto d-block h-100 max-width-100 image-x"));
+    element
+        .append($("<button></button>")
+            .addClass("btn-close x-icon hide-button")
+            .attr("type", "button")
+            .attr("onclick", "removeImage(" + questionID + ")"));
+}
+
+function addModalImageDropzone(element, questionID) {
+    element.append($("<button></button>")
+        .addClass("btn btn-primary")
+        .attr("type", "button")
+        .attr("data-bs-toggle", "modal")
+        .attr("data-bs-target", "#" + "ModalDropzone" + questionID)
+        .text("Загрузить"));
+
+    element.append($("<div></div>")
+        .addClass("modal fade")
+        .attr("id", "ModalDropzone" + questionID)
+        .attr("tabindex", "-1")
+        .attr("aria-labelledby", "ModalDropzoneLabel" + questionID)
+        .attr("aria-hidden", "true")
+        .append(
+            $("<div></div>")
+                .addClass("modal-dialog")
+                .append(
+                    $("<div></div>")
+                        .addClass("modal-content")
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-header")
+                                .append(
+                                    $("<h5></h5>")
+                                        .addClass("modal-title")
+                                        .attr("id", "ModalDropzoneLabel" + questionID)
+                                        .text("Добавь картинку"))
+                                .append(
+                                    $("<button></button>")
+                                        .addClass("btn-close")
+                                        .attr("type", "button")
+                                        .attr("data-bs-dismiss", "modal")
+                                        .attr("aria-label", "Закрыть")))
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-body")
+                                .append(
+                                    $("<div></div>")
+                                        .attr("id", "Dropzone" + questionID)
+                                        .addClass("dropzone")))
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-footer")
+                                .append(
+                                    $("<button></button>")
+                                        .addClass("btn btn-secondary")
+                                        .attr("type", "button")
+                                        .attr("data-bs-dismiss", "modal")
+                                        .text("Закрыть"))))));
+
+    $("#" + "Dropzone" + questionID).dropzone(
+        {
+            url: "/editor/upload_image",
+            paramName: 'file',
+            chunking: false,
+            maxFilesize: 10,
+            maxFiles: 1,
+            acceptedFiles: "image/*",
+            resizeQuality: 0.9,
+            resizeMimeType: "image/jpeg",
+            resizeWidth: 1500,
+            init: function () {
+                this.on("success", function (file, response) {
+                    $("#ModalDropzone" + questionID).modal('hide');
+                    element.empty();
+                    addImagePreview(element, response, questionID);
+                })
+                this.on("sending", function (file, xhr, formData) {
+                    formData.append("question_id", questionID);
+                });
+            }
+        })
+}
+
+function removeImage(questionID) {
+    socket.emit("remove_image", questionID, function (response) {
+        if (response === "success") {
+            let imageColumn = $("#" + "imageColumn" + questionID);
+            imageColumn.empty();
+            addModalImageDropzone(imageColumn, questionID);
+        }
+    });
+}
 
 // $('.the-textarea').on('input propertychange change', function() {
 //     console.log('Textarea Change');

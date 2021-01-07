@@ -9,4 +9,4 @@ blinker
 psycopg2-binary
 eventlet
 gunicorn
-pillow
+pillow-simd

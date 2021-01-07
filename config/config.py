@@ -1,4 +1,4 @@
 COUNTDOWN_DURATION = 8000  # ms
-IMAGES_DIR = "static/images"
-IMAGE_SIZE = (160, 300)
-IMAGE_QUALITY = 90
+IMAGES_DIR = "static/images/user_content"
+THUMBNAIL_WIDTH = 320
+THUMBNAIL_QUALITY = 90

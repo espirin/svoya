@@ -2,7 +2,7 @@ import os
 import random
 
 import shortuuid
-from werkzeug.utils import secure_filename
+from PIL import Image
 
 from config import config
 from model import Game, Pack
@@ -35,5 +35,10 @@ def create_new_image_id() -> str:
     return image_id
 
 
-def get_file_extension(filename: str) -> str:
-    return secure_filename(filename).rsplit('.', 1)[1].lower()
+def create_thumbnail(file) -> Image:
+    im = Image.open(file)
+    width, height = im.size
+    new_height = int(config.THUMBNAIL_WIDTH * height / width)
+
+    im = im.resize((config.THUMBNAIL_WIDTH, new_height))
+    return im

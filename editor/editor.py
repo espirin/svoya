@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 
 from flask import Blueprint, render_template, request, jsonify, flash, redirect
@@ -7,7 +8,7 @@ from app import db, socketio
 from config import config
 from editor.videoprocessor.video_processor import check_video_embeddable
 from model import Pack, Question
-from model.shared.shared import create_new_pack_id, create_new_image_id, get_file_extension
+from model.shared.shared import create_new_pack_id, create_new_image_id, create_thumbnail
 
 editor = Blueprint('editor', __name__, template_folder='templates')
 
@@ -48,16 +49,20 @@ def upload_image():
 
     if file:
         image_id = create_new_image_id()
-        extension = get_file_extension(file.filename)
-        path = f"{config.IMAGES_DIR}/{image_id}.{extension}"
+        path = f"{config.IMAGES_DIR}/{image_id}.jpeg"
         with open(path, "wb") as f:
             f.write(file.read())
 
+        thumbnail = create_thumbnail(file)
+        thumbnail_path = f"{config.IMAGES_DIR}/{image_id}_thumbnail.jpeg"
+        thumbnail.save(thumbnail_path, optimize=True, quality=config.THUMBNAIL_WIDTH)
+
         question = Question.query.filter(Question.id == request.form['question_id']).first()
         question.image_url = path
+        question.image_thumbnail_url = thumbnail_path
         db.session.commit()
 
-        return jsonify(path)
+        return jsonify(f"/{thumbnail_path}")
 
 
 @socketio.on('update_question_text')
@@ -110,11 +115,30 @@ def get_boards(pack_id: int):
                 "id": question.id,
                 "text": question.text,
                 "answer": question.answer,
-                "image_url": question.image_url,
+                "image_url": f"/{question.image_thumbnail_url}" if question.image_url is not None else None,
                 "video_id": question.video_id,
                 "video_start": question.video_start,
                 "video_end": question.video_end
             } for question in topic.questions]
         } for topic in board.topics],
     } for board in pack.boards]
+
+    boards.sort(key=lambda board: board['id'])
+    for board in boards:
+        board['topics'].sort(key=lambda topic: topic['id'])
+        for topic in board['topics']:
+            topic['questions'].sort(key=lambda question: question['id'])
     return boards
+
+
+@socketio.on('remove_image')
+@login_required
+def remove_image(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    os.remove(question.image_url)
+    os.remove(question.image_thumbnail_url)
+    question.image_url = None
+    question.image_thumbnail_url = None
+    db.session.commit()
+
+    return "success"

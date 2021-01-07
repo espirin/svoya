@@ -10,6 +10,7 @@ class Question(db.Model):
     price = db.Column(db.Integer, nullable=False)
 
     image_url = db.Column(db.String(128))
+    image_thumbnail_url = db.Column(db.String(128))
     video_id = db.Column(db.String(16))
     video_start = db.Column(db.Integer)
     video_end = db.Column(db.Integer)
