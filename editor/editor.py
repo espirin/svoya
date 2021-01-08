@@ -98,17 +98,15 @@ def update_question_price(data: Dict):
 @socketio.on('check_video')
 @login_required
 def check_video_handler(video_id: str) -> str:
-    if len(video_id) > 15:
-        return "video_id_too_long"
-    if check_video_embeddable(video_id):
-        return "ok"
-    return "not_embeddable"
+    if len(video_id) != 11:
+        return "video_id_incorrect"
+    return check_video_embeddable(video_id)
 
 
 @socketio.on('update_video')
 @login_required
-def update_video(question_id: int, data: Dict):
-    question = Question.query.filter(Question.id == question_id).first()
+def update_video(data: Dict):
+    question = Question.query.filter(Question.id == data['question_id']).first()
     question.video_id = data['video_id']
     question.video_start = data['video_start']
     question.video_end = data['video_end']

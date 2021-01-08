@@ -36,7 +36,7 @@
     max-width: 100%;
 }
 
-.x-icon {
+.show-on-hover-button {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -48,11 +48,46 @@
     display: none;
 }
 
-.x-image:hover > img{
-    opacity: 0.4;
+.button-with-image-overlay:hover > .dim-image {
+    opacity: 0.3;
 }
 
-.x-image:hover > .hide-button{
+.button-with-image-overlay:hover > .hide-button {
     display: block;
 }
 
+.edit-button {
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    padding: 0.25em 0.25em;
+    color: #000;
+    background: transparent url("/static/images/edit_icon.png") center/1em auto no-repeat;
+    border: 0;
+    border-radius: 0.25rem;
+    opacity: 0.5;
+}
+
+.edit-button:hover {
+    color: #000;
+    text-decoration: none;
+    opacity: 0.75;
+}
+
+.edit-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    opacity: 1;
+}
+
+.edit-button:disabled, .edit-button.disabled {
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    opacity: 0.25;
+}
+
+.video-editor-id-row {
+    height: 70px;
+}

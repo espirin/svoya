@@ -27,7 +27,7 @@ function update_clients(clients) {
                     .attr("style", "height: 210px")
                     .append($("<img>")
                         .addClass("card-img-top")
-                        .attr("src", "/static/app/images/bobr.jpg"))
+                        .attr("src", "/static/images/bobr.jpg"))
                     .append($("<div></div>")
                         .addClass(clients['players'][i]['countdown_winner']
                             ? "card-body text-white bg-primary" : "card-body")
@@ -49,7 +49,7 @@ function update_clients(clients) {
                 .attr("style", "height: 210px")
                 .append($("<img>")
                     .addClass("card-img-top")
-                    .attr("src", "/static/app/images/bobr.jpg"))
+                    .attr("src", "/static/images/bobr.jpg"))
                 .append($("<div></div>")
                     .addClass("card-body")
                     .append($("<div></div>")

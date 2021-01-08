@@ -11,7 +11,7 @@ class Question(db.Model):
 
     image_url = db.Column(db.String(128))
     image_thumbnail_url = db.Column(db.String(128))
-    video_id = db.Column(db.String(16))
+    video_id = db.Column(db.String(11))
     video_start = db.Column(db.Integer)
     video_end = db.Column(db.Integer)
 

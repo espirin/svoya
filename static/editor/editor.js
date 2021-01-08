@@ -123,24 +123,28 @@ $(function () {
                                             })))));
 
                     let questionsRow = $("#" + "QuestionsRow" + question['id']);
-
                     // Video
                     let videoColumn = $("<div></div>")
-                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center")
+                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center button-with-image-overlay")
+                        .attr("style", "position:relative; display:inline-block")
                         .attr("id", "videoColumn" + question['id']);
                     questionsRow.append(videoColumn);
+
                     if (question['video_id'] == null) {
                         addAddVideoButton(videoColumn, question['id']);
                     } else {
                         addVideoPreview(videoColumn, question['video_id'], question['id']);
                     }
+                    addModalVideoEditor(questionsRow, question['id'], question['video_id'], question['video_start'],
+                        question['video_end']);
 
                     // Image
                     let imageColumn = $("<div></div>")
-                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center x-image")
+                        .addClass("col-2 ml-2 h-100 d-flex align-items-center justify-content-center button-with-image-overlay")
                         .attr("style", "position:relative; display:inline-block")
                         .attr("id", "imageColumn" + question['id']);
                     questionsRow.append(imageColumn);
+
                     if (question['image_url'] == null) {
                         addModalImageDropzone(imageColumn, question['id']);
                     } else {
@@ -157,6 +161,8 @@ function addAddVideoButton(element, questionID) {
         $("<button></button>")
             .addClass("btn btn-secondary")
             .text("Добавить")
+            .attr("data-bs-toggle", "modal")
+            .attr("data-bs-target", "#" + "ModalVideoEditor" + questionID)
             .attr("onclick", "viewVideoInfo(" + questionID + ")"));
 }
 
@@ -164,18 +170,178 @@ function addVideoPreview(element, videoID, questionID) {
     element
         .append($("<img>")
             .attr("src", "https://img.youtube.com/vi/" + videoID + "/mqdefault.jpg")
-            .attr("onclick", "viewVideoInfo(" + questionID + ")")
-            .addClass("rounded mx-auto d-block h-100 max-width-100"));
+            .attr("data-bs-toggle", "modal")
+            .attr("data-bs-target", "#" + "ModalVideoEditor" + questionID)
+            .addClass("rounded mx-auto d-block h-100 max-width-100 dim-image"))
+    element
+        .append($("<button></button>")
+            .attr("type", "button")
+            .attr("data-bs-toggle", "modal")
+            .addClass("show-on-hover-button hide-button edit-button")
+            .attr("data-bs-target", "#" + "ModalVideoEditor" + questionID));
+}
+
+function addModalVideoEditor(element, questionID, videoID, videoStart, videoEnd) {
+    element.append($("<div></div>")
+        .addClass("modal fade")
+        .attr("id", "ModalVideoEditor" + questionID)
+        .attr("tabindex", "-1")
+        .attr("aria-labelledby", "ModalVideoEditorLabel" + questionID)
+        .attr("aria-hidden", "true")
+        .append(
+            $("<div></div>")
+                .addClass("modal-dialog")
+                .append(
+                    $("<div></div>")
+                        .addClass("modal-content")
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-header")
+                                .append(
+                                    $("<h5></h5>")
+                                        .addClass("modal-title")
+                                        .attr("id", "ModalVideoEditorLabel" + questionID)
+                                        .text("Добавь видео"))
+                                .append(
+                                    $("<button></button>")
+                                        .addClass("btn-close")
+                                        .attr("type", "button")
+                                        .attr("data-bs-dismiss", "modal")))
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-body col")
+                                .append(
+                                    $("<form></form>")
+                                        .addClass("row video-editor-id-row")
+                                        .append(
+                                            $("<div></div>")
+                                                .addClass("col-8 h-100")
+                                                .append(
+                                                    $("<label></label>")
+                                                        .attr("for", "VideoID" + questionID)
+                                                        .text("ID"))
+                                                .append(
+                                                    $("<input>")
+                                                        .attr("maxlength", "11")
+                                                        .attr("id", "VideoID" + questionID)
+                                                        .addClass("form-control")
+                                                        .attr("placeholder", "ID")
+                                                        .val(videoID)
+                                                        .on("input propertychange change", function () {
+                                                            try {
+                                                                clearTimeout(timeoutId);
+                                                            } catch {
+                                                            }
+                                                            let newVideoID = $("#VideoID" + questionID).val();
+                                                            let modalImageText = $("#ModalVideoPreviewImageText" + questionID);
+                                                            let modalVideoPreview = $("#ModalVideoPreviewImage" + questionID);
+                                                            let modalVideoSaveButton = $("#saveVideoButton" + questionID);
+
+                                                            if (newVideoID.length !== 11) {
+                                                                modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
+                                                                modalVideoPreview.show();
+                                                                modalImageText.hide();
+                                                                modalVideoSaveButton.prop('disabled', true);
+                                                            }
+                                                            timeoutId = setTimeout(function () {
+                                                                socket.emit("check_video",
+                                                                    newVideoID,
+                                                                    function (response) {
+                                                                        if (response === "ok") {
+                                                                            modalVideoPreview.attr("src", "https://img.youtube.com/vi/" + newVideoID + "/mqdefault.jpg");
+                                                                            modalVideoPreview.show();
+                                                                            modalImageText.hide();
+                                                                            modalVideoSaveButton.prop('disabled', false);
+                                                                        }
+                                                                        if (response === "video_id_incorrect" || response === "not_found" || response === "error") {
+                                                                            modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
+                                                                            modalVideoPreview.show();
+                                                                            modalImageText.hide();
+                                                                        }
+                                                                        if (response === "not_embeddable") {
+                                                                            modalVideoPreview.hide();
+                                                                            modalImageText.text("Невозможно встроить видео");
+                                                                            modalImageText.show();
+                                                                        }
+                                                                    });
+                                                            }, 500);
+                                                        })))
+                                        .append(
+                                            $("<div></div>")
+                                                .addClass("col-4 h-100")
+                                                .append(
+                                                    $("<img>")
+                                                        .attr("id", "ModalVideoPreviewImage" + questionID)
+                                                        .attr("src", (videoID == null) ?
+                                                            "/static/images/warning_icon.png" :
+                                                            "https://img.youtube.com/vi/" + videoID + "/mqdefault.jpg")
+                                                        .addClass("h-100 row rounded mx-auto"))
+                                                .append($("<div></div>")
+                                                    .addClass("row h-100 align-items-center justify-content-center text-center")
+                                                    .attr("style", "display: none")
+                                                    .attr("id", "ModalVideoPreviewImageText" + questionID))))
+                                .append(
+                                    $("<form></form>")
+                                        .addClass("row mt-2")
+                                        .append(
+                                            $("<div></div>")
+                                                .addClass("col")
+                                                .append(
+                                                    $("<label></label>")
+                                                        .attr("for", "VideoStart" + questionID)
+                                                        .text("Начало (сек)"))
+                                                .append(
+                                                    $("<input>")
+                                                        .attr("type", "number")
+                                                        .attr("min", "0")
+                                                        .attr("id", "VideoStart" + questionID)
+                                                        .addClass("form-control")
+                                                        .attr("placeholder", "0")
+                                                        .val(videoStart))))
+                                .append(
+                                    $("<form></form>")
+                                        .addClass("row mt-2")
+                                        .append(
+                                            $("<div></div>")
+                                                .addClass("col")
+                                                .append(
+                                                    $("<label></label>")
+                                                        .attr("for", "VideoEnd" + questionID)
+                                                        .text("Конец (сек)"))
+                                                .append(
+                                                    $("<input>")
+                                                        .attr("type", "number")
+                                                        .attr("min", "0")
+                                                        .attr("id", "VideoEnd" + questionID)
+                                                        .addClass("form-control")
+                                                        .attr("placeholder", "10")
+                                                        .val(videoEnd)))))
+                        .append(
+                            $("<div></div>")
+                                .addClass("modal-footer")
+                                .append(
+                                    $("<button></button>")
+                                        .addClass("btn btn-secondary")
+                                        .attr("type", "button")
+                                        .attr("data-bs-dismiss", "modal")
+                                        .text("Закрыть"))
+                                .append(
+                                    $("<button></button>")
+                                        .addClass("btn btn-primary")
+                                        .attr("type", "button")
+                                        .attr("id", "saveVideoButton" + questionID)
+                                        .attr("onclick", "saveVideoData(" + questionID + ")")
+                                        .text("Сохранить"))))));
 }
 
 function addImagePreview(element, url, questionID) {
     element
         .append($("<img>")
             .attr("src", url)
-            .addClass("rounded mx-auto d-block h-100 max-width-100"));
+            .addClass("rounded mx-auto d-block h-100 max-width-100 dim-image"));
     element
         .append($("<button></button>")
-            .addClass("btn-close x-icon hide-button")
+            .addClass("btn-close show-on-hover-button hide-button")
             .attr("type", "button")
             .attr("onclick", "removeImage(" + questionID + ")"));
 }
@@ -263,4 +429,19 @@ function removeImage(questionID) {
             addModalImageDropzone(imageColumn, questionID);
         }
     });
+}
+
+function saveVideoData(questionID) {
+    let newVideoID = $("#VideoID" + questionID).val();
+    socket.emit("update_video", {
+        "question_id": questionID,
+        "video_id": newVideoID,
+        "video_start": $("#VideoStart" + questionID).val(),
+        "video_end": $("#VideoEnd" + questionID).val(),
+    });
+
+    let videoColumn = $("#videoColumn" + questionID);
+    videoColumn.empty();
+    addVideoPreview(videoColumn, newVideoID, questionID);
+    $("#ModalVideoEditor" + questionID).modal('hide');
 }
