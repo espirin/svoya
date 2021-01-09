@@ -8,7 +8,7 @@ class Pack(db.Model):
     name = db.Column(db.String(128))
     public = db.Column(db.Boolean)
 
-    boards = db.relationship("Board", backref="pack", lazy=True)
+    boards = db.relationship("Board", backref="pack", lazy=True, cascade="all, delete")
 
     owner_username = db.Column(db.String(64), db.ForeignKey('users.username'), nullable=False)
 

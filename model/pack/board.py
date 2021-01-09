@@ -6,7 +6,7 @@ class Board(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
-    topics = db.relationship("Topic", backref="board", lazy=True)
+    topics = db.relationship("Topic", backref="board", lazy=True, cascade="all, delete")
 
     pack_id = db.Column(db.Integer, db.ForeignKey('packs.id'), nullable=False)
 

@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 from app import db, socketio
 from config import config
 from editor.videoprocessor.video_processor import check_video_embeddable
-from model import Pack, Question
+from model import Pack, Question, Topic, Board
 from model.shared.shared import create_new_pack_id, create_new_image_id, create_thumbnail
 
 editor = Blueprint('editor', __name__, template_folder='templates')
@@ -182,3 +182,77 @@ def get_video_data(question_id):
         "video_start": question.video_start,
         "video_end": question.video_end
     }
+
+
+@socketio.on('create_question')
+@login_required
+def create_question(topic_id):
+    topic = Topic.query.filter(Topic.id == topic_id).first()
+    question = Question()
+    topic.questions.append(question)
+    db.session.commit()
+
+    return {
+        "id": question.id,
+        "text": None,
+        "answer": None,
+        "price": None,
+        "image_url": None,
+        "video_id": None,
+        "video_start": None,
+        "video_end": None
+    }
+
+
+@socketio.on('delete_question')
+@login_required
+def delete_question(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    db.session.delete(question)
+    db.session.commit()
+
+
+@socketio.on('create_topic')
+@login_required
+def create_topic(board_id):
+    board = Board.query.filter(Board.id == board_id).first()
+    topic = Topic()
+    board.topics.append(topic)
+    db.session.commit()
+
+    return {
+        "name": None,
+        "id": topic.id,
+        "questions": []
+    }
+
+
+@socketio.on('delete_topic')
+@login_required
+def delete_topic(topic_id):
+    topic = Topic.query.filter(Topic.id == topic_id).first()
+    db.session.delete(topic)
+    db.session.commit()
+
+
+@socketio.on('create_board')
+@login_required
+def create_board(pack_id):
+    pack = Pack.query.filter(Pack.id == pack_id).first()
+    board = Board()
+    pack.boards.append(board)
+    db.session.commit()
+
+    return {
+        "id": board.id,
+        "name": None,
+        "topics": []
+    }
+
+
+@socketio.on('delete_board')
+@login_required
+def delete_board(board_id):
+    board = Board.query.filter(Board.id == board_id).first()
+    db.session.delete(board)
+    db.session.commit()

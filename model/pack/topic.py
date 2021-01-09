@@ -5,8 +5,8 @@ class Topic(db.Model):
     __tablename__ = 'topics'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
-    questions = db.relationship("Question", backref="topic", lazy=True)
+    name = db.Column(db.String(128))
+    questions = db.relationship("Question", backref="topic", lazy=True, cascade="all, delete")
 
     board_id = db.Column(db.Integer, db.ForeignKey('boards.id'), nullable=False)
 

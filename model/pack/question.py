@@ -6,8 +6,8 @@ class Question(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
-    answer = db.Column(db.Text, nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    answer = db.Column(db.Text,)
+    price = db.Column(db.Integer)
 
     image_url = db.Column(db.String(128))
     image_thumbnail_url = db.Column(db.String(128))
