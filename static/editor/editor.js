@@ -162,8 +162,7 @@ function addAddVideoButton(element, questionID) {
             .addClass("btn btn-secondary")
             .text("Добавить")
             .attr("data-bs-toggle", "modal")
-            .attr("data-bs-target", "#" + "ModalVideoEditor" + questionID)
-            .attr("onclick", "viewVideoInfo(" + questionID + ")"));
+            .attr("data-bs-target", "#" + "ModalVideoEditor" + questionID));
 }
 
 function addVideoPreview(element, videoID, questionID) {
@@ -228,43 +227,7 @@ function addModalVideoEditor(element, questionID, videoID, videoStart, videoEnd)
                                                         .attr("placeholder", "ID")
                                                         .val(videoID)
                                                         .on("input propertychange change", function () {
-                                                            try {
-                                                                clearTimeout(timeoutId);
-                                                            } catch {
-                                                            }
-                                                            let newVideoID = $("#VideoID" + questionID).val();
-                                                            let modalImageText = $("#ModalVideoPreviewImageText" + questionID);
-                                                            let modalVideoPreview = $("#ModalVideoPreviewImage" + questionID);
-                                                            let modalVideoSaveButton = $("#saveVideoButton" + questionID);
-
-                                                            if (newVideoID.length !== 11) {
-                                                                modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
-                                                                modalVideoPreview.show();
-                                                                modalImageText.hide();
-                                                                modalVideoSaveButton.prop('disabled', true);
-                                                            }
-                                                            timeoutId = setTimeout(function () {
-                                                                socket.emit("check_video",
-                                                                    newVideoID,
-                                                                    function (response) {
-                                                                        if (response === "ok") {
-                                                                            modalVideoPreview.attr("src", "https://img.youtube.com/vi/" + newVideoID + "/mqdefault.jpg");
-                                                                            modalVideoPreview.show();
-                                                                            modalImageText.hide();
-                                                                            modalVideoSaveButton.prop('disabled', false);
-                                                                        }
-                                                                        if (response === "video_id_incorrect" || response === "not_found" || response === "error") {
-                                                                            modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
-                                                                            modalVideoPreview.show();
-                                                                            modalImageText.hide();
-                                                                        }
-                                                                        if (response === "not_embeddable") {
-                                                                            modalVideoPreview.hide();
-                                                                            modalImageText.text("Невозможно встроить видео");
-                                                                            modalImageText.show();
-                                                                        }
-                                                                    });
-                                                            }, 500);
+                                                            checkVideo(questionID, true);
                                                         })))
                                         .append(
                                             $("<div></div>")
@@ -294,6 +257,7 @@ function addModalVideoEditor(element, questionID, videoID, videoStart, videoEnd)
                                                     $("<input>")
                                                         .attr("type", "number")
                                                         .attr("min", "0")
+                                                        .attr("oninput", "this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null")
                                                         .attr("id", "VideoStart" + questionID)
                                                         .addClass("form-control")
                                                         .attr("placeholder", "0")
@@ -312,6 +276,7 @@ function addModalVideoEditor(element, questionID, videoID, videoStart, videoEnd)
                                                     $("<input>")
                                                         .attr("type", "number")
                                                         .attr("min", "0")
+                                                        .attr("oninput", "this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null")
                                                         .attr("id", "VideoEnd" + questionID)
                                                         .addClass("form-control")
                                                         .attr("placeholder", "10")
@@ -327,11 +292,21 @@ function addModalVideoEditor(element, questionID, videoID, videoStart, videoEnd)
                                         .text("Закрыть"))
                                 .append(
                                     $("<button></button>")
+                                        .addClass("btn btn-danger")
+                                        .attr("type", "button")
+                                        .attr("onclick", "removeVideo(" + questionID + ")")
+                                        .text("Удалить"))
+                                .append(
+                                    $("<button></button>")
                                         .addClass("btn btn-primary")
                                         .attr("type", "button")
                                         .attr("id", "saveVideoButton" + questionID)
                                         .attr("onclick", "saveVideoData(" + questionID + ")")
                                         .text("Сохранить"))))));
+
+    document.getElementById("ModalVideoEditor" + questionID).addEventListener('show.bs.modal', function () {
+        resetVideoData(questionID);
+    })
 }
 
 function addImagePreview(element, url, questionID) {
@@ -438,10 +413,90 @@ function saveVideoData(questionID) {
         "video_id": newVideoID,
         "video_start": $("#VideoStart" + questionID).val(),
         "video_end": $("#VideoEnd" + questionID).val(),
+    }, function (oldVideoID) {
+        if (newVideoID !== oldVideoID) {
+            let videoColumn = $("#videoColumn" + questionID);
+            videoColumn.empty();
+            addVideoPreview(videoColumn, newVideoID, questionID);
+        }
     });
+
+    $("#ModalVideoEditor" + questionID).modal('hide');
+}
+
+function removeVideo(questionID) {
+    socket.emit("remove_video", questionID);
 
     let videoColumn = $("#videoColumn" + questionID);
     videoColumn.empty();
-    addVideoPreview(videoColumn, newVideoID, questionID);
-    $("#ModalVideoEditor" + questionID).modal('hide');
+    let modalVideoEditor = $("#ModalVideoEditor" + questionID);
+    addAddVideoButton(videoColumn, questionID);
+    modalVideoEditor.modal('hide');
+    modalVideoEditor.remove()
+    addModalVideoEditor($("#QuestionsRow" + questionID), questionID, null, null,
+        null);
+}
+
+function resetVideoData(questionID,) {
+    socket.emit("get_video_data", questionID, function (response) {
+        $("#VideoID" + questionID).val(response['video_id']);
+        $("#VideoStart" + questionID).val(response['video_start']);
+        $("#VideoEnd" + questionID).val(response['video_end']);
+
+        checkVideo(questionID, false);
+    })
+}
+
+function checkVideo(questionID, withTimeout) {
+    if (withTimeout) {
+        try {
+            clearTimeout(timeoutId);
+        } catch {
+        }
+    }
+
+    let newVideoID = $("#VideoID" + questionID).val();
+    let modalImageText = $("#ModalVideoPreviewImageText" + questionID);
+    let modalVideoPreview = $("#ModalVideoPreviewImage" + questionID);
+    let modalVideoSaveButton = $("#saveVideoButton" + questionID);
+
+    if (newVideoID.length !== 11) {
+        modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
+        modalVideoPreview.show();
+        modalImageText.hide();
+        modalVideoSaveButton.prop('disabled', true);
+    }
+
+    if (withTimeout) {
+        timeoutId = setTimeout(function () {
+            checkVideoOnServer(newVideoID, modalVideoPreview, modalImageText, modalVideoSaveButton)
+        }, 500);
+    } else {
+        checkVideoOnServer(newVideoID, modalVideoPreview, modalImageText, modalVideoSaveButton)
+    }
+
+}
+
+function checkVideoOnServer(newVideoID, modalVideoPreview, modalImageText, modalVideoSaveButton) {
+    socket.emit("check_video",
+        newVideoID,
+        function (response) {
+            if (response === "ok") {
+                let videoPreviewURL = "https://img.youtube.com/vi/" + newVideoID + "/mqdefault.jpg";
+                if (modalVideoPreview.attr("src") !== videoPreviewURL) modalVideoPreview.attr("src", videoPreviewURL);
+                modalVideoPreview.show();
+                modalImageText.hide();
+                modalVideoSaveButton.prop('disabled', false);
+            }
+            if (response === "video_id_incorrect" || response === "not_found" || response === "error") {
+                modalVideoPreview.attr("src", "/static/images/not_found_icon.png");
+                modalVideoPreview.show();
+                modalImageText.hide();
+            }
+            if (response === "not_embeddable") {
+                modalVideoPreview.hide();
+                modalImageText.text("Невозможно встроить видео");
+                modalImageText.show();
+            }
+        });
 }

@@ -107,10 +107,13 @@ def check_video_handler(video_id: str) -> str:
 @login_required
 def update_video(data: Dict):
     question = Question.query.filter(Question.id == data['question_id']).first()
+    old_video_id = question.video_id
     question.video_id = data['video_id']
     question.video_start = data['video_start']
     question.video_end = data['video_end']
     db.session.commit()
+
+    return old_video_id
 
 
 @socketio.on('get_boards')
@@ -155,3 +158,27 @@ def remove_image(question_id):
     db.session.commit()
 
     return "success"
+
+
+@socketio.on('remove_video')
+@login_required
+def remove_video(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    question.video_id = None
+    question.video_start = None
+    question.video_end = None
+    db.session.commit()
+
+    return "success"
+
+
+@socketio.on('get_video_data')
+@login_required
+def get_video_data(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+
+    return {
+        "video_id": question.video_id,
+        "video_start": question.video_start,
+        "video_end": question.video_end
+    }
