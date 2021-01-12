@@ -4,47 +4,31 @@ let packID = $("#packID").text();
 $(function () {
     Dropzone.autoDiscover = false;
 
+    $("#packName")
+        .addClass("col-4")
+        .append(
+            $("<input>")
+                .attr("id", "PackName" + packID)
+                .addClass("form-control")
+                .attr("maxlength", "128")
+                .attr("placeholder", "Раунд")
+                .val($("#packHiddenName").text())
+                .on("input propertychange change", function () {
+                    try {
+                        clearTimeout(window["updatePackNameTimeout" + packID]);
+                    } catch {
+                    }
+                    window["updatePackNameTimeout" + packID] = setTimeout(function () {
+                        socket.emit("update_pack_name", {
+                            "pack_id": packID,
+                            "name": $("#PackName" + packID).val()
+                        });
+                    }, 500);
+                }))
+
     socket.emit("get_boards", packID, function (boards) {
         for (let i = 0; i < boards.length; i++) {
-            const board = boards[i];
-            $("#tabsHeader").append(
-                $("<li></li>")
-                    .addClass("nav-item")
-                    .attr("role", "presentation")
-                    .append($("<a></a>")
-                        .addClass((i === 0) ? "nav-link active" : "nav-link")
-                        .attr("id", "Pill" + board['id'])
-                        .attr("data-bs-toggle", "pill")
-                        .attr("href", "#" + "Tab" + board['id'])
-                        .attr("role", "tab")
-                        .attr("aria-controls", "Tab" + board['id'])
-                        .attr("aria-selected", (i === 0) ? "true" : "false")
-                        .text(board['name'])));
-
-            $("#tabsContent").append(
-                $("<div></div>")
-                    .addClass((i === 0) ? "tab-pane fade show active" : "tab-pane fade")
-                    .attr("id", "Tab" + board['id'])
-                    .attr("role", "tabpanel")
-                    .attr("aria-labelledby", "Pill" + board['id'])
-                    .append(
-                        $("<div></div>")
-                            .addClass("card mt-2 mb-3")
-                            .append(
-                                $("<div></div>")
-                                    .addClass("card-body")
-                                    .append($("<h5></h5>")
-                                        .text(board['name']))
-                                    .attr("id", "boardBody" + board['id']))));
-
-            let boardBody = $("#boardBody" + board['id']);
-            for (const topic of board['topics']) {
-                addTopic(boardBody, topic);
-            }
-            boardBody.append($("<button></button>")
-                .addClass("btn btn-primary mt-3")
-                .text("Добавить")
-                .attr("onclick", "addNewTopic(" + board['id'] + ");"))
+            addBoard(boards[i], i);
         }
     })
 })
@@ -343,7 +327,7 @@ function resetVideoData(questionID,) {
 function checkVideo(questionID, withTimeout) {
     if (withTimeout) {
         try {
-            clearTimeout(timeoutId);
+            clearTimeout(window["updateVideoTimeout" + questionID]);
         } catch {
         }
     }
@@ -361,7 +345,7 @@ function checkVideo(questionID, withTimeout) {
     }
 
     if (withTimeout) {
-        timeoutId = setTimeout(function () {
+        window["updateVideoTimeout" + questionID] = setTimeout(function () {
             checkVideoOnServer(newVideoID, modalVideoPreview, modalImageText, modalVideoSaveButton)
         }, 500);
     } else {
@@ -402,28 +386,29 @@ function addQuestion(topicID, question) {
             .append(
                 $("<div></div>")
                     .addClass("row question align-items-center")
-                    .attr("id", "QuestionsRow" + question['id']).append(
-                    $("<form></form>")
-                        .addClass("col h-100")
-                        .append(
-                            $("<textarea>")
-                                .attr("rows", "3")
-                                .attr("id", "QuestionText" + question['id'])
-                                .addClass("form-control h-100")
-                                .attr("placeholder", "Вопрос")
-                                .val(question['text'])
-                                .on("input propertychange change", function () {
-                                    try {
-                                        clearTimeout(timeoutId);
-                                    } catch {
-                                    }
-                                    timeoutId = setTimeout(function () {
-                                        socket.emit("update_question_text", {
-                                            "question_id": question['id'],
-                                            "text": $("#QuestionText" + question['id']).val()
-                                        });
-                                    }, 500);
-                                }))).append(
+                    .attr("id", "QuestionsRow" + question['id'])
+                    .append(
+                        $("<form></form>")
+                            .addClass("col h-100")
+                            .append(
+                                $("<textarea>")
+                                    .attr("rows", "3")
+                                    .attr("id", "QuestionText" + question['id'])
+                                    .addClass("form-control h-100")
+                                    .attr("placeholder", "Вопрос")
+                                    .val(question['text'])
+                                    .on("input propertychange change", function () {
+                                        try {
+                                            clearTimeout(window["updateQuestionTextTimeout" + question['id']]);
+                                        } catch {
+                                        }
+                                        window["updateQuestionTextTimeout" + question['id']] = setTimeout(function () {
+                                            socket.emit("update_question_text", {
+                                                "question_id": question['id'],
+                                                "text": $("#QuestionText" + question['id']).val()
+                                            });
+                                        }, 500);
+                                    }))).append(
                     $("<form></form>")
                         .addClass("ml-2 col h-100")
                         .append(
@@ -435,10 +420,10 @@ function addQuestion(topicID, question) {
                                 .val(question['answer'])
                                 .on("input propertychange change", function () {
                                     try {
-                                        clearTimeout(timeoutId);
+                                        clearTimeout(window["updateQuestionAnswerTimeout" + question['id']]);
                                     } catch {
                                     }
-                                    timeoutId = setTimeout(function () {
+                                    window["updateQuestionAnswerTimeout" + question['id']] = setTimeout(function () {
                                         socket.emit("update_question_answer", {
                                             "question_id": question['id'],
                                             "answer": $("#QuestionAnswer" + question['id']).val()
@@ -457,10 +442,10 @@ function addQuestion(topicID, question) {
                                 .val(question['price'])
                                 .on("input propertychange change", function () {
                                     try {
-                                        clearTimeout(timeoutId);
+                                        clearTimeout(window["updateQuestionPriceTimeout" + question['id']]);
                                     } catch {
                                     }
-                                    timeoutId = setTimeout(function () {
+                                    window["updateQuestionPriceTimeout" + question['id']] = setTimeout(function () {
                                         socket.emit("update_question_price", {
                                             "question_id": question['id'],
                                             "price": $("#QuestionPrice" + question['id']).val()
@@ -510,38 +495,142 @@ function addQuestion(topicID, question) {
 function addTopic(boardBody, topic) {
     boardBody.append(
         $("<div></div>")
-            .addClass("card mt-2")
+            .addClass("card mt-3")
             .attr("id", "topic" + topic['id'])
             .append(
                 $("<div></div>")
                     .addClass("card-body")
-                    .append($("<h5></h5>")
-                        .addClass("card-title")
-                        .text(topic['name'])
-                        .attr("id", topic['id']))
+                    .append(
+                        $("<div></div>")
+                            .addClass("row")
+                            .append(
+                                $("<h5></h5>")
+                                    .addClass("col-2")
+                                    .text("Тема"))
+                            .append(
+                                $("<div></div>")
+                                    .addClass("col-8"))
+                            .append(
+                                $("<button></button>")
+                                    .addClass("col-2 btn btn-danger align-self-center")
+                                    .attr("onclick", "deleteTopic(" + topic['id'] + ")")
+                                    .text("Удалить тему")))
+                    .append(
+                        $("<form></form>")
+                            .addClass("col-4")
+                            .append(
+                                $("<input>")
+                                    .attr("id", "TopicName" + topic['id'])
+                                    .addClass("form-control")
+                                    .attr("maxlength", "128")
+                                    .attr("placeholder", "Тема")
+                                    .val(topic['name'])
+                                    .on("input propertychange change", function () {
+                                        try {
+                                            clearTimeout(window["updateTopicNameTimeout" + topic['id']]);
+                                        } catch {
+                                        }
+                                        window["updateTopicNameTimeout" + topic['id']] = setTimeout(function () {
+                                            socket.emit("update_topic_name", {
+                                                "topic_id": topic['id'],
+                                                "name": $("#TopicName" + topic['id']).val()
+                                            });
+                                        }, 500);
+                                    })))
                     .append($("<ul></ul>")
-                        .addClass("list-group")
+                        .addClass("list-group mt-2")
                         .attr("id", "QuestionsList" + topic['id']))
                     .append($("<div></div>")
                         .addClass("row ms-1 me-1 mt-3")
                         .append($("<button></button>")
                             .addClass("btn btn-primary col-2")
-                            .text("Добавить")
+                            .text("Добавить вопрос")
                             .attr("onclick", "addNewQuestion(" + topic['id'] + ");"))
                         .append($("<div></div>")
-                            .addClass("col-8"))
-                        .append($("<button></button>")
-                            .addClass("btn btn-danger col-2")
-                            .text("Удалить тему")
-                            .attr("onclick", "deleteTopic(" + topic['id'] + ");")))));
+                            .addClass("col-8")))));
 
     for (const question of topic['questions']) {
         addQuestion(topic['id'], question);
     }
 }
 
-function addBoard() {
-//    TODO
+function addBoard(board, i) {
+    $("#tabsHeader").append(
+        $("<li></li>")
+            .addClass("nav-item")
+            .attr("role", "presentation")
+            .append($("<a></a>")
+                .addClass((i === 0) ? "nav-link active" : "nav-link")
+                .attr("id", "Pill" + board['id'])
+                .attr("data-bs-toggle", "pill")
+                .attr("href", "#" + "Tab" + board['id'])
+                .attr("role", "tab")
+                .attr("aria-controls", "Tab" + board['id'])
+                .attr("aria-selected", (i === 0) ? "true" : "false")
+                .text(board['name'])));
+
+    $("#tabsContent").append(
+        $("<div></div>")
+            .addClass((i === 0) ? "tab-pane fade show active" : "tab-pane fade")
+            .attr("id", "Tab" + board['id'])
+            .attr("role", "tabpanel")
+            .attr("aria-labelledby", "Pill" + board['id'])
+            .append(
+                $("<div></div>")
+                    .addClass("card mt-2 mb-3")
+                    .append(
+                        $("<div></div>")
+                            .addClass("card-body")
+                            .attr("id", "boardBody" + board['id'])
+                            .append(
+                                $("<div></div>")
+                                    .addClass("row")
+                                    .append(
+                                        $("<h5></h5>")
+                                            .addClass("col-2")
+                                            .text("Раунд"))
+                                    .append(
+                                        $("<div></div>")
+                                            .addClass("col-8"))
+                                    .append(
+                                        $("<button></button>")
+                                            .addClass("col-2 btn btn-danger align-self-center")
+                                            .attr("onclick", "deleteBoard(" + board['id'] + ")")
+                                            .text("Удалить раунд")))
+                            .append(
+                                $("<form></form>")
+                                    .addClass("col-4")
+                                    .append(
+                                        $("<input>")
+                                            .attr("id", "BoardName" + board['id'])
+                                            .addClass("form-control")
+                                            .attr("maxlength", "128")
+                                            .attr("placeholder", "Раунд")
+                                            .val(board['name'])
+                                            .on("input propertychange change", function () {
+                                                try {
+                                                    clearTimeout(window["updateBoardNameTimeout" + board['id']]);
+                                                } catch {
+                                                }
+                                                window["updateBoardNameTimeout" + board['id']] = setTimeout(function () {
+                                                    let newName = $("#BoardName" + board['id']).val();
+                                                    socket.emit("update_board_name", {
+                                                        "board_id": board['id'],
+                                                        "name": newName
+                                                    });
+                                                    $("#Pill" + board['id']).text(newName);
+                                                }, 500);
+                                            }))
+                            ))));
+
+    let boardBody = $("#boardBody" + board['id']);
+    for (const topic of board['topics']) {
+        addTopic(boardBody, topic);
+    }
+    boardBody.append($("<button></button>")
+        .addClass("btn btn-primary mt-3")
+        .text("Добавить тему")
+        .attr("onclick", "addNewTopic(" + board['id'] + ");"))
 }
 
 function addNewQuestion(topicID) {
@@ -569,13 +658,15 @@ function deleteTopic(topicID) {
 }
 
 function addNewBoard(packID) {
-    socket.emit("create_board", packID, function (topic) {
-        addTopic($("#boardBody" + boardID), topic);
+    socket.emit("create_board", packID, function (board) {
+        addBoard(board, $("#tabsHeader li").length);
     });
 }
 
 function deleteBoard(boardID) {
     socket.emit("delete_board", boardID, function () {
-        $("#topic" + topicID).remove();
+        $("#board" + boardID).remove();
+        $("#Pill" + boardID).remove();
+        $("#Tab" + boardID).remove();
     })
 }

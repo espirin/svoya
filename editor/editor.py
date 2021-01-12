@@ -242,10 +242,12 @@ def create_board(pack_id):
     board = Board()
     pack.boards.append(board)
     db.session.commit()
+    board.name = f"Раунд {board.id}"
+    db.session.commit()
 
     return {
         "id": board.id,
-        "name": None,
+        "name": board.name,
         "topics": []
     }
 
@@ -255,4 +257,34 @@ def create_board(pack_id):
 def delete_board(board_id):
     board = Board.query.filter(Board.id == board_id).first()
     db.session.delete(board)
+    db.session.commit()
+
+
+@socketio.on('update_board_name')
+@login_required
+def update_board_name(data):
+    board_id = data['board_id']
+    name = data['name']
+    board = Board.query.filter(Board.id == board_id).first()
+    board.name = name
+    db.session.commit()
+
+
+@socketio.on('update_topic_name')
+@login_required
+def update_topic_name(data):
+    topic_id = data['topic_id']
+    name = data['name']
+    topic = Topic.query.filter(Topic.id == topic_id).first()
+    topic.name = name
+    db.session.commit()
+
+
+@socketio.on('update_pack_name')
+@login_required
+def update_pack_name(data):
+    pack_id = data['pack_id']
+    name = data['name']
+    pack = Pack.query.filter(Pack.id == pack_id).first()
+    pack.name = name
     db.session.commit()
