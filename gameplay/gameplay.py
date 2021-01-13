@@ -1,15 +1,16 @@
 from datetime import datetime
 
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 from app import socketio, db
+from auth.auth import authenticated_only
 from config import config
 from gameplay.state_handler import GameState, update_clients_state
 from model import Game, BoardProgress, Question
 
 
 @socketio.on('start_game', namespace='/host')
-@login_required
+@authenticated_only
 def start_game(game_id):
     # Change game state to BOARD
     game = Game.query.filter(Game.id == game_id).first()
@@ -22,7 +23,7 @@ def start_game(game_id):
 
 
 @socketio.on('open_question', namespace='/player')
-@login_required
+@authenticated_only
 def open_question(data):
     question_id = data['question_id']
     game_id = data['game_id']
@@ -39,7 +40,7 @@ def open_question(data):
 
 
 @socketio.on('start_countdown', namespace='/host')
-@login_required
+@authenticated_only
 def start_countdown(game_id):
     # Update clients
     socketio.emit('start_countdown', room=game_id, namespace="/player")
@@ -58,7 +59,7 @@ def start_countdown(game_id):
 
 
 @socketio.on('end_countdown', namespace='/player')
-@login_required
+@authenticated_only
 def end_countdown(game_id):
     # Change game state to CORRECT_ANSWER
     game = Game.query.filter(Game.id == game_id).first()
@@ -74,7 +75,7 @@ def end_countdown(game_id):
 
 
 @socketio.on('answer_question', namespace='/player')
-@login_required
+@authenticated_only
 def answer_question(game_id):
     # Check if first to answer
     game = Game.query.filter(Game.id == game_id).first()
@@ -97,7 +98,7 @@ def answer_question(game_id):
 
 
 @socketio.on('correct_answer', namespace='/host')
-@login_required
+@authenticated_only
 def correct_answer(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
@@ -117,7 +118,7 @@ def correct_answer(game_id):
 
 
 @socketio.on('wrong_answer', namespace='/host')
-@login_required
+@authenticated_only
 def wrong_answer(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     question = Question.query.filter(Question.id == game.temporary_state['question_id']).first()
@@ -145,7 +146,7 @@ def wrong_answer(game_id):
 
 
 @socketio.on('open_board', namespace='/host')
-@login_required
+@authenticated_only
 def open_board(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     game.state = GameState.BOARD.value

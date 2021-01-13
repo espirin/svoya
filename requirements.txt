@@ -8,5 +8,4 @@ sentry-sdk
 blinker
 psycopg2-binary
 eventlet
-gunicorn
 pillow-simd

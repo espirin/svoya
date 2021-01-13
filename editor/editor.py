@@ -5,8 +5,9 @@ from flask import Blueprint, render_template, request, jsonify, flash, redirect
 from flask_login import login_required, current_user
 
 from app import db, socketio
+from auth.auth import authenticated_only
 from config import config
-from editor.videoprocessor.video_processor import check_video_embeddable
+from editor.video_processor import check_video_embeddable
 from model import Pack, Question, Topic, Board
 from model.shared.shared import create_new_pack_id, create_new_image_id, create_thumbnail
 
@@ -66,7 +67,7 @@ def upload_image():
 
 
 @socketio.on('update_question_text')
-@login_required
+@authenticated_only
 def update_question_text(data: Dict):
     question_id = data['question_id']
     text = data['text']
@@ -76,7 +77,7 @@ def update_question_text(data: Dict):
 
 
 @socketio.on('update_question_answer')
-@login_required
+@authenticated_only
 def update_question_answer(data: Dict):
     question_id = data['question_id']
     answer = data['answer']
@@ -86,7 +87,7 @@ def update_question_answer(data: Dict):
 
 
 @socketio.on('update_question_price')
-@login_required
+@authenticated_only
 def update_question_price(data: Dict):
     question_id = data['question_id']
     price = data['price']
@@ -96,7 +97,7 @@ def update_question_price(data: Dict):
 
 
 @socketio.on('check_video')
-@login_required
+@authenticated_only
 def check_video_handler(video_id: str) -> str:
     if len(video_id) != 11:
         return "video_id_incorrect"
@@ -104,7 +105,7 @@ def check_video_handler(video_id: str) -> str:
 
 
 @socketio.on('update_video')
-@login_required
+@authenticated_only
 def update_video(data: Dict):
     question = Question.query.filter(Question.id == data['question_id']).first()
     old_video_id = question.video_id
@@ -117,7 +118,7 @@ def update_video(data: Dict):
 
 
 @socketio.on('get_boards')
-@login_required
+@authenticated_only
 def get_boards(pack_id: int):
     pack = Pack.query.filter(Pack.id == pack_id).first()
     boards = [{
@@ -148,7 +149,7 @@ def get_boards(pack_id: int):
 
 
 @socketio.on('remove_image')
-@login_required
+@authenticated_only
 def remove_image(question_id):
     question = Question.query.filter(Question.id == question_id).first()
     os.remove(question.image_url)
@@ -161,7 +162,7 @@ def remove_image(question_id):
 
 
 @socketio.on('remove_video')
-@login_required
+@authenticated_only
 def remove_video(question_id):
     question = Question.query.filter(Question.id == question_id).first()
     question.video_id = None
@@ -173,7 +174,7 @@ def remove_video(question_id):
 
 
 @socketio.on('get_video_data')
-@login_required
+@authenticated_only
 def get_video_data(question_id):
     question = Question.query.filter(Question.id == question_id).first()
 
@@ -185,7 +186,7 @@ def get_video_data(question_id):
 
 
 @socketio.on('create_question')
-@login_required
+@authenticated_only
 def create_question(topic_id):
     topic = Topic.query.filter(Topic.id == topic_id).first()
     question = Question()
@@ -205,7 +206,7 @@ def create_question(topic_id):
 
 
 @socketio.on('delete_question')
-@login_required
+@authenticated_only
 def delete_question(question_id):
     question = Question.query.filter(Question.id == question_id).first()
     db.session.delete(question)
@@ -213,7 +214,7 @@ def delete_question(question_id):
 
 
 @socketio.on('create_topic')
-@login_required
+@authenticated_only
 def create_topic(board_id):
     board = Board.query.filter(Board.id == board_id).first()
     topic = Topic()
@@ -228,7 +229,7 @@ def create_topic(board_id):
 
 
 @socketio.on('delete_topic')
-@login_required
+@authenticated_only
 def delete_topic(topic_id):
     topic = Topic.query.filter(Topic.id == topic_id).first()
     db.session.delete(topic)
@@ -236,7 +237,7 @@ def delete_topic(topic_id):
 
 
 @socketio.on('create_board')
-@login_required
+@authenticated_only
 def create_board(pack_id):
     pack = Pack.query.filter(Pack.id == pack_id).first()
     board = Board()
@@ -253,7 +254,7 @@ def create_board(pack_id):
 
 
 @socketio.on('delete_board')
-@login_required
+@authenticated_only
 def delete_board(board_id):
     board = Board.query.filter(Board.id == board_id).first()
     db.session.delete(board)
@@ -261,7 +262,7 @@ def delete_board(board_id):
 
 
 @socketio.on('update_board_name')
-@login_required
+@authenticated_only
 def update_board_name(data):
     board_id = data['board_id']
     name = data['name']
@@ -271,7 +272,7 @@ def update_board_name(data):
 
 
 @socketio.on('update_topic_name')
-@login_required
+@authenticated_only
 def update_topic_name(data):
     topic_id = data['topic_id']
     name = data['name']
@@ -281,7 +282,7 @@ def update_topic_name(data):
 
 
 @socketio.on('update_pack_name')
-@login_required
+@authenticated_only
 def update_pack_name(data):
     pack_id = data['pack_id']
     name = data['name']

@@ -1,13 +1,14 @@
-from flask_login import login_required, current_user
+from flask_login import current_user
 from flask_socketio import join_room, leave_room
 
 from app import socketio, db
+from auth.auth import authenticated_only
 from gameplay.state_handler import update_clients
 from model import Game, User
 
 
 @socketio.on('connect_player', namespace='/player')
-@login_required
+@authenticated_only
 def connect_player(game_id):
     game = Game.query.filter(Game.id == game_id).first()
 
@@ -30,7 +31,7 @@ def connect_player(game_id):
 
 
 @socketio.on('disconnect', namespace='/player')
-@login_required
+@authenticated_only
 def disconnect_player():
     game = Game.query.filter(Game.players.any(User.username == current_user.username)).first()
     if game is not None:  # Check if the game was exited from another browser tab
@@ -42,7 +43,7 @@ def disconnect_player():
 
 
 @socketio.on('connect_host', namespace='/host')
-@login_required
+@authenticated_only
 def connect_host(game_id):
     game = Game.query.filter(Game.id == game_id).first()
 
@@ -61,7 +62,7 @@ def connect_host(game_id):
 
 
 @socketio.on('disconnect', namespace='/host')
-@login_required
+@authenticated_only
 def disconnect_host():
     game = Game.query.filter(Game.host == current_user).first()
     if game is not None:  # Check if the game was exited from another browser tab
@@ -73,6 +74,6 @@ def disconnect_host():
 
 
 @socketio.on('ping', namespace='/')
-@login_required
+@authenticated_only
 def ping():
     return "pong"

@@ -1,9 +1,8 @@
 from enum import Enum
 from typing import List, Dict
 
-from flask_login import login_required
-
 from app import socketio, db
+from auth.auth import authenticated_only
 from model import Game, Question
 
 
@@ -17,7 +16,7 @@ class GameState(Enum):
 
 
 @socketio.on('get_game_state', namespace='/')
-@login_required
+@authenticated_only
 def get_game_state(game_id):
     game = Game.query.filter(Game.id == game_id).first()
     if game is None:

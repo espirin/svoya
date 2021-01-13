@@ -1,14 +1,26 @@
 import base64
+import functools
 from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, request, abort
 from flask_login import login_required, logout_user, current_user, login_user
+from flask_socketio import disconnect
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import login_manager, db
 from model.user import User
 
 auth = Blueprint('auth', __name__, template_folder='templates')
+
+
+def authenticated_only(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            disconnect()
+        else:
+            return f(*args, **kwargs)
+    return wrapped
 
 
 @login_manager.user_loader
