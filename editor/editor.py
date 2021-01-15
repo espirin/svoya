@@ -192,7 +192,6 @@ def create_question(topic_id):
     question = Question()
     topic.questions.append(question)
     db.session.commit()
-    print(question.id)
 
     return {
         "id": question.id,
