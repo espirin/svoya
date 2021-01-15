@@ -621,13 +621,14 @@ function addBoard(board, i) {
                                                     $("#Pill" + board['id']).text(newName);
                                                 }, 500);
                                             }))
-                            ))));
+                            )
+                            .append(
+                                $("<div></div>").attr("id", "topicsList" + board['id'])))));
 
-    let boardBody = $("#boardBody" + board['id']);
     for (const topic of board['topics']) {
-        addTopic(boardBody, topic);
+        addTopic($("#topicsList" + board['id']), topic);
     }
-    boardBody.append($("<button></button>")
+    $("#boardBody" + board['id']).append($("<button></button>")
         .addClass("btn btn-primary mt-3")
         .text("Добавить тему")
         .attr("onclick", "addNewTopic(" + board['id'] + ");"))
@@ -647,7 +648,7 @@ function deleteQuestion(questionID) {
 
 function addNewTopic(boardID) {
     socket.emit("create_topic", boardID, function (topic) {
-        addTopic($("#boardBody" + boardID), topic);
+        addTopic($("#topicsList" + boardID), topic);
     });
 }
 

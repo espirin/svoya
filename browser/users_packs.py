@@ -22,5 +22,6 @@ def view_pack():
     return jsonify({
         "name": pack.name,
         "id": pack.id,
-        "topics": topics
+        "topics": topics,
+        "editor_url": f"{request.url_root}editor/{pack_id}"
     })

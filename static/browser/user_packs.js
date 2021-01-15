@@ -9,16 +9,19 @@ function viewPack(pack_id) {
             $('#createGameButton').on("click", function () {
                 createGame(data['id']);
             });
+            $('#editPackButton').on("click", function () {
+                window.location.href = data['editor_url'];
+            });
 
             const topics = $('#topicsList');
             topics.empty();
             $.each(data['topics'], function (i) {
                 $('<a/>')
                     .text(data['topics'][i])
-                    .addClass("list-group-item list-group-item-action")
-                    .attr("role", "tab")
+                    .addClass("list-group-item")
                     .appendTo(topics);
             });
+            $("#packColumn").show();
         }
     })
 }
