@@ -56,7 +56,7 @@ def unauthorized():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index.index_page'))
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', next=request.args.get('next'))
 
 
 @auth.route('/login', methods=['POST'])
@@ -70,9 +70,9 @@ def login_post():
         return "User with this username not found"
     if check_password_hash(user.password_hash, password):
         login_user(user, remember=True)
-        next = request.args.get('next')
-        if next != 'auth.login' and next is not None:
-            return redirect(next)
+        next_url = request.args.get('next')
+        if next_url != 'auth.login' and next_url is not None:
+            return redirect(next_url)
         return redirect(url_for('index.index_page'))
     return "Wrong password"
 
@@ -107,4 +107,5 @@ def signup_post():
     user = User(username=username, name=name, created=datetime.now(), password_hash=password_hash)
     db.session.add(user)
     db.session.commit()
-    return redirect(url_for('index.index_page'))
+    login_user(user, remember=True)
+    return redirect(request.args.get('next'))
