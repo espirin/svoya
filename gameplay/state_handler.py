@@ -108,7 +108,7 @@ def create_question_info(question) -> Dict:
         "text": question.text,
         "answer": question.answer,
         "price": question.price,
-        "image_url": f"/{question.image_url}",
+        "image_url": f"/{question.image_url}" if question.image_url else None,
         "video_id": question.video_id,
         "video_start": question.video_start,
         "video_end": question.video_end,
