@@ -1,7 +1,9 @@
 const generalSocket = io('/');
 new ClipboardJS('#copyURLButton');
 
+let currentState;
 let gameID = $("#gameID").text();
+let username = $("#username").text();
 
 setInterval(function () {
     let startTime = Date.now();
@@ -19,6 +21,15 @@ function update_clients(clients) {
     const players = $('#playersCards');
     players.empty();
     $.each(clients['players'], function (i) {
+        if (clients['players'][i]['username'] === username) {
+            if (clients['players'][i]['can_answer']) {
+                $("#answerDisabledButton").hide();
+                $("#answerButton").show();
+            } else {
+                $("#answerButton").hide();
+                $("#answerDisabledButton").show();
+            }
+        }
         players.append(
             $('<div/>')
                 .addClass("col")
@@ -29,14 +40,20 @@ function update_clients(clients) {
                         .addClass("card-img-top")
                         .attr("src", "/static/images/bobr.jpg"))
                     .append($("<div></div>")
-                        .addClass(clients['players'][i]['countdown_winner']
-                            ? "card-body text-white bg-primary" : "card-body")
+                        .attr("id", "cardBody" + clients['players'][i]['username'])
                         .append($("<div></div>")
                             .addClass("col")
                             .append($("<h5></h5>").addClass("card-title text-center text-truncate")
                                 .text(clients['players'][i]["name"]))
                             .append($("<h5></h5>").addClass("card-title text-center font-weight-bold")
                                 .text(clients['players'][i]["score"]))))))
+        if (clients['players'][i]['countdown_winner']) {
+            $("#cardBody" + clients['players'][i]['username']).addClass("card-body text-white bg-primary")
+        } else if (clients['players'][i]['can_answer']) {
+            $("#cardBody" + clients['players'][i]['username']).addClass("card-body")
+        } else {
+            $("#cardBody" + clients['players'][i]['username']).addClass("card-body bg-secondary")
+        }
     });
 
     const host = $('#hostCard');
@@ -71,7 +88,6 @@ function update_clients(clients) {
     hostCardBody.append($("<h5></h5>")
         .addClass("card-title text-center font-weight-bold mt-2")
         .text("хост"))
-
 }
 
 function showBoard(state) {
@@ -95,10 +111,10 @@ function showBoard(state) {
                 row.append($("<button></button>")
                     .attr("type", "button")
                     .addClass("btn btn-secondary")
-                    .html(question['price'])
-                    .attr("onclick", "openQuestion(" + question['id'] + ");"));
+                    .html(question['price']));
             } else {
                 row.append($("<button></button>")
+                    .attr("id", "questionButton" + question['id'])
                     .attr("type", "button")
                     .addClass("btn btn-primary")
                     .html(question['price'])
@@ -155,6 +171,22 @@ function showImage(state) {
     image.show();
 }
 
+function showQuestionSelection(state) {
+    let questionButton = $("#questionButton" + state['question']['id']);
+    questionButton.addClass("btn-success");
+    questionButton.removeAttr("onclick");
+    setTimeout(function () {
+        showQuestionData(state);
+    }, 500)
+}
+
+function showQuestionData(state) {
+    showQuestion(state);
+    showQuestionButtons();
+    if (state['question']['video_id'] != null) playVideo(state);
+    if (state['question']['image_url'] != null) showImage(state);
+}
+
 function update_state(state) {
     if (state['state'] === 'LOBBY') {
         $('#message').text("Лобби");
@@ -167,10 +199,12 @@ function update_state(state) {
         showBoardButtons();
     }
     if (state['state'] === 'QUESTION') {
-        showQuestion(state);
-        showQuestionButtons();
-        if (state['question']['video_id'] != null) playVideo(state);
-        if (state['question']['image_url'] != null) showImage(state);
+        if (currentState === "BOARD") {
+            showQuestionSelection(state)
+        } else {
+            showQuestionData(state)
+        }
+
     }
     if (state['state'] === 'COUNTDOWN') {
         hideVideo();
@@ -190,4 +224,5 @@ function update_state(state) {
         showCorrectAnswerButtons();
         if (state['question']['image_url'] != null) showImage(state);
     }
+    currentState = state['state'];
 }

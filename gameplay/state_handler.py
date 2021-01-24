@@ -91,6 +91,8 @@ def create_players_info(game) -> List[Dict]:
         player['next_turn'] = game.next_turn == player
         player['countdown_winner'] = 'countdown_winner' in game.temporary_state \
                                      and game.temporary_state['countdown_winner'] == player['username']
+        player['can_answer'] = not ('answered_wrong' in game.temporary_state and
+                                    player['username'] in game.temporary_state['answered_wrong'])
 
     return players
 
@@ -113,6 +115,15 @@ def create_question_info(question) -> Dict:
         "video_start": question.video_start,
         "video_end": question.video_end,
     }
+
+# TODO: дефолтные имена в редакторе
+# TODO: auto host
+# TODO: дефолтные значеня в редакторе
+# TODO: https ссылки
+# TODO: окончание игры
+# TODO: видео вместо игры
+# TODO: ссылка вместо id
+# TODO: максимальные значения в редакторе
 
 
 def update_clients_state(game_id):

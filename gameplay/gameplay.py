@@ -54,6 +54,7 @@ def start_countdown(game_id):
     game.temporary_state['countdown_time'] = config.COUNTDOWN_DURATION
     game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
     game.temporary_state['countdown_time_remaining'] = config.COUNTDOWN_DURATION
+    game.temporary_state['answered_wrong'] = []
     db.session.commit()
     update_clients_state(game_id)
 
@@ -79,7 +80,7 @@ def end_countdown(game_id):
 def answer_question(game_id):
     # Check if first to answer
     game = Game.query.filter(Game.id == game_id).first()
-    if game.state != GameState.COUNTDOWN.value:
+    if game.state != GameState.COUNTDOWN.value or current_user.username in game.temporary_state['answered_wrong']:
         return "nope"
 
     # Change game state to ANSWERING
@@ -138,6 +139,12 @@ def wrong_answer(game_id):
 
         # Update start time
         game.temporary_state['countdown_start_time'] = datetime.now().isoformat()
+
+        # Add player to answered list
+        game.temporary_state['answered_wrong'].append(game.temporary_state['countdown_winner'])
+
+        # Reset countdown winner
+        game.temporary_state['countdown_winner'] = None
 
     db.session.commit()
 
